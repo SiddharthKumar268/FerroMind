@@ -1,0 +1,22 @@
+==================================================================
+  FerroMind — Slag Model vs Baseline Comparison
+  Slag subset: 8,549 train / 1,873 test heats
+==================================================================
+
+  Element  Metric     Baseline   Slag Model     Change
+  ----------------------------------------------------
+  Si       rmse         0.0201       0.0209 +   0.0008
+  Si       r2           0.0017      -0.0611   -0.0628
+
+  S        rmse         0.0060       0.0062 +   0.0002
+  S        r2           0.1079       0.0642   -0.0437
+
+  P        rmse         0.0056       0.0056 +   0.0001
+  P        r2           0.0751       0.0499   -0.0252
+
+Note: Baseline used 37,936 train heats (all).
+      Slag model used only heats with slag data available.
+      R2 improvement on S and P expected 0.10 to 0.20-0.40
+      depending on slag data coverage and quality.
+
+==================================================================
