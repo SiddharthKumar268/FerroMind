@@ -105,14 +105,16 @@ header {
   position: sticky;
   top: 0;
   z-index: 200;
-  height: 56px;
+  min-height: 56px;
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  gap: 16px;
+  gap: 12px;
+  overflow-x: auto;
+  flex-wrap: nowrap;
 }
 
 /* Logo */
@@ -181,8 +183,9 @@ header {
 .h-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .api-badge {
@@ -218,21 +221,36 @@ header {
 }
 
 .btn-logout {
-  padding: 5px 12px;
-  background: var(--s1);
-  border: 1px solid var(--border);
+  padding: 5px 14px;
+  background: rgba(229,72,77,.08);
+  border: 1px solid rgba(229,72,77,.30);
   border-radius: var(--r-sm);
-  color: var(--text2);
+  color: #e57b7e;
   font-family: var(--body);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
-  transition: all .15s;
+  white-space: nowrap;
+  transition:
+    background   .2s cubic-bezier(.4,0,.2,1),
+    border-color .2s cubic-bezier(.4,0,.2,1),
+    box-shadow   .3s cubic-bezier(.4,0,.2,1),
+    color        .2s ease,
+    transform    .2s cubic-bezier(.4,0,.2,1);
+  flex-shrink: 0;
 }
 
 .btn-logout:hover {
-  border-color: var(--border2);
-  color: var(--text);
+  background: rgba(229,72,77,.18);
+  border-color: rgba(229,72,77,.65);
+  color: #fff;
+  box-shadow: 0 0 0 1px rgba(229,72,77,.3), 0 0 14px rgba(229,72,77,.25);
+  transform: translateY(-1px);
+}
+
+.btn-logout:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
 
@@ -1412,4 +1430,12 @@ main {
   .comp-grid                               { grid-template-columns: repeat(2, 1fr); }
   .kpi-strip, .analytics-kpis, .model-grid { grid-template-columns: 1fr; }
   .opt-grid                                { grid-template-columns: 1fr; }
+}
+
+/* -----------------------------------------------------
+   SESSION TIMEOUT MODAL ANIMATION
+   ----------------------------------------------------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(24px) scale(.97); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
 }

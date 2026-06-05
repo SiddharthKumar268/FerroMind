@@ -394,6 +394,67 @@
     <!-- ═══ TOAST CONTAINER ═══ -->
     <div id="toastContainer"></div>
 
+    <!-- ═══ SESSION TIMEOUT MODAL ═══ -->
+    <div id="sessionModal" style="
+      display:none;
+      position:fixed;top:0;left:0;right:0;bottom:0;
+      background:rgba(1,1,2,.82);
+      backdrop-filter:blur(6px);
+      -webkit-backdrop-filter:blur(6px);
+      z-index:9999;
+      align-items:center;
+      justify-content:center;
+    ">
+      <div style="
+        background:#0f1114;
+        border:1px solid rgba(229,72,77,.45);
+        border-radius:14px;
+        padding:36px 40px;
+        max-width:400px;
+        width:90%;
+        text-align:center;
+        box-shadow:0 0 0 1px rgba(229,72,77,.25),0 0 40px rgba(229,72,77,.18);
+        animation:fadeInUp .35s cubic-bezier(.4,0,.2,1);
+      ">
+        <div style="font-size:36px;margin-bottom:12px">⏱</div>
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:600;color:#f7f8f8;margin-bottom:8px">Session Expiring Soon</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:#8a8f98;margin-bottom:20px;line-height:1.6">
+          Your session will automatically end due to inactivity.<br>
+          You will be logged out in <strong id="sessionCountdown" style="color:#e5484d;font-family:'JetBrains Mono',monospace;font-size:15px">60</strong> seconds.
+        </div>
+        <div style="display:flex;gap:10px;justify-content:center">
+          <button onclick="extendSession()" style="
+            padding:9px 22px;
+            background:#5e6ad2;
+            border:none;
+            border-radius:8px;
+            color:#fff;
+            font-family:'Inter',sans-serif;
+            font-size:14px;
+            font-weight:500;
+            cursor:pointer;
+            transition:all .2s;
+          " onmouseover="this.style.background='#828fff'" onmouseout="this.style.background='#5e6ad2'">
+            Stay Logged In
+          </button>
+          <button onclick="handleLogout()" style="
+            padding:9px 22px;
+            background:rgba(229,72,77,.12);
+            border:1px solid rgba(229,72,77,.4);
+            border-radius:8px;
+            color:#e57b7e;
+            font-family:'Inter',sans-serif;
+            font-size:14px;
+            font-weight:500;
+            cursor:pointer;
+            transition:all .2s;
+          " onmouseover="this.style.background='rgba(229,72,77,.25)'" onmouseout="this.style.background='rgba(229,72,77,.12)'">
+            Logout Now
+          </button>
+        </div>
+      </div>
+    </div>
+
     <script>
       // ── JWT Fetch Interceptor ──
       const _fetch = window.fetch;
@@ -410,8 +471,81 @@
       document.addEventListener('DOMContentLoaded', () => {
         const u = localStorage.getItem('ferromind_user') || 'User';
         document.getElementById('userNameText').textContent = '👤 ' + u;
+        initSessionTimeout();
       });
-      function handleLogout() { localStorage.removeItem('ferromind_token'); localStorage.removeItem('ferromind_user'); window.location.href = 'login.html'; }
+
+      function handleLogout() {
+        clearSessionTimeout();
+        localStorage.removeItem('ferromind_token');
+        localStorage.removeItem('ferromind_user');
+        localStorage.removeItem('ferromind_login_time');
+        window.location.href = 'login.html';
+      }
+
+      // ── Session Timeout Manager ──
+      // 30 min inactivity → 60-sec warning → auto logout
+      const SESSION_IDLE_MS   = 29 * 60 * 1000;  // 29 min idle → show warning
+      const SESSION_WARN_SEC  = 60;               // 60-second countdown
+      const SESSION_TOTAL_MS  = 30 * 60 * 1000;  // 30 min = hard logout
+
+      let _sessionIdleTimer    = null;
+      let _sessionCountTimer   = null;
+      let _sessionCountSeconds = SESSION_WARN_SEC;
+
+      const SESSION_EVENTS = ['mousemove','mousedown','keydown','scroll','touchstart','click'];
+
+      function initSessionTimeout() {
+        resetIdleTimer();
+        SESSION_EVENTS.forEach(ev =>
+          document.addEventListener(ev, onActivity, { passive: true })
+        );
+      }
+
+      function clearSessionTimeout() {
+        clearTimeout(_sessionIdleTimer);
+        clearInterval(_sessionCountTimer);
+        SESSION_EVENTS.forEach(ev =>
+          document.removeEventListener(ev, onActivity)
+        );
+      }
+
+      function onActivity() {
+        // Only reset if warning modal is NOT showing
+        const modal = document.getElementById('sessionModal');
+        if (modal && modal.style.display === 'flex') return;
+        resetIdleTimer();
+      }
+
+      function resetIdleTimer() {
+        clearTimeout(_sessionIdleTimer);
+        clearInterval(_sessionCountTimer);
+        _sessionIdleTimer = setTimeout(showSessionWarning, SESSION_IDLE_MS);
+      }
+
+      function showSessionWarning() {
+        _sessionCountSeconds = SESSION_WARN_SEC;
+        const modal = document.getElementById('sessionModal');
+        const countEl = document.getElementById('sessionCountdown');
+        if (modal) modal.style.display = 'flex';
+        if (countEl) countEl.textContent = _sessionCountSeconds;
+
+        _sessionCountTimer = setInterval(() => {
+          _sessionCountSeconds--;
+          if (countEl) countEl.textContent = _sessionCountSeconds;
+          if (_sessionCountSeconds <= 0) {
+            clearInterval(_sessionCountTimer);
+            handleLogout();
+          }
+        }, 1000);
+      }
+
+      function extendSession() {
+        clearInterval(_sessionCountTimer);
+        const modal = document.getElementById('sessionModal');
+        if (modal) modal.style.display = 'none';
+        resetIdleTimer();
+        if (typeof showToast === 'function') showToast('Session extended — 30 minutes reset', 'success', 3000);
+      }
 
       const API = '/api';
       let _activeModel = 'xgboost_composition';
