@@ -1,0 +1,525 @@
+/* ═══════════════════════════════════════════════════════
+   FERROMIND — Login Page
+   Uses the same Linear Design System as the dashboard.
+   Canvas #010102 · Lavender #5e6ad2 · Inter + JetBrains Mono
+   
+   TABLE OF CONTENTS:
+   1. Design Tokens (shared with dashboard)
+   2. Reset & Base
+   3. Background Effects
+   4. Auth Wrapper & Animation
+   5. Logo Block
+   6. Auth Card
+   7. Banners (Error / Success)
+   8. Form Fields
+   9. Password Strength
+   10. Buttons
+   11. Toggle Link
+   12. Footer
+   13. Status Dots
+   14. Utilities
+   ═══════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────
+   1. DESIGN TOKENS
+   Same as dashboard.css for visual consistency
+   ───────────────────────────────────────────────────── */
+:root {
+  /* Surface Ladder */
+  --bg:        #010102;
+  --s1:        #0f1114;
+  --s2:        #1a1c22;
+  --s3:        #23262d;
+  --s4:        #2c2f38;
+
+  /* Hairlines */
+  --border:    #23252a;
+  --border2:   #34373e;
+  --border3:   #2a2d34;
+
+  /* Brand Accent (Linear Lavender) */
+  --gold:      #5e6ad2;
+  --gold2:     #828fff;
+  --gold-focus:#5e69d1;
+
+  /* Semantic Colors */
+  --green:     #27a644;
+  --green2:    #34d399;
+  --red:       #e5484d;
+  --amber:     #f5a623;
+
+  /* Text Hierarchy */
+  --text:      #f7f8f8;
+  --text2:     #8a8f98;
+  --text3:     #62666d;
+
+  /* Fonts */
+  --mono:      'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --display:   'Inter', system-ui, -apple-system, sans-serif;
+  --body:      'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Radius Scale */
+  --r-xs:      4px;
+  --r-sm:      8px;
+  --r:         12px;
+  --r-pill:    9999px;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   2. RESET & BASE
+   ───────────────────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 14px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: rgba(94,106,210,.3);
+  color: #fff;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   3. BACKGROUND EFFECTS
+   ───────────────────────────────────────────────────── */
+
+/* Subtle grid pattern */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(94,106,210,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(94,106,210,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Ambient glow */
+body::after {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(94,106,210,0.1) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   4. AUTH WRAPPER & ANIMATION
+   ───────────────────────────────────────────────────── */
+.auth-wrapper {
+  width: 100%;
+  max-width: 440px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+  animation: fadeUp 0.5s ease both;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ─────────────────────────────────────────────────────
+   5. LOGO BLOCK
+   ───────────────────────────────────────────────────── */
+.logo-block {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.logo-emblem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  background: var(--s1);
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-emblem::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(94,106,210,0.15), transparent);
+}
+
+.logo-emblem svg {
+  position: relative;
+  z-index: 1;
+}
+
+.logo-text {
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+  color: var(--text);
+  display: block;
+  line-height: 1;
+}
+
+.logo-text span {
+  color: var(--gold);
+}
+
+.logo-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.logo-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.logo-divider::before,
+.logo-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+}
+
+.logo-divider span {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1px;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   6. AUTH CARD
+   ───────────────────────────────────────────────────── */
+.auth-card {
+  background: var(--s1);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 32px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top accent line — uses brand lavender */
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), var(--gold2), transparent);
+  opacity: 0.6;
+}
+
+.card-title {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-title .icon {
+  font-size: 16px;
+  opacity: 0.8;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 24px;
+  font-family: var(--mono);
+}
+
+
+/* ─────────────────────────────────────────────────────
+   7. BANNERS (Error / Success)
+   ───────────────────────────────────────────────────── */
+.banner {
+  display: none;
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  font-family: var(--body);
+}
+
+.banner.error {
+  display: block;
+  background: rgba(229,72,77,0.08);
+  border: 1px solid rgba(229,72,77,0.25);
+  color: var(--red);
+}
+
+.banner.success {
+  display: block;
+  background: rgba(39,166,68,0.08);
+  border: 1px solid rgba(39,166,68,0.25);
+  color: var(--green);
+}
+
+
+/* ─────────────────────────────────────────────────────
+   8. FORM FIELDS
+   ───────────────────────────────────────────────────── */
+.field {
+  margin-bottom: 16px;
+}
+
+.field label {
+  display: block;
+  font-family: var(--body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 7px;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(94,106,210,0.2);
+}
+
+.field input::placeholder {
+  color: var(--text3);
+  font-family: var(--body);
+  font-size: 13px;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   9. PASSWORD STRENGTH
+   ───────────────────────────────────────────────────── */
+.strength-bar-container {
+  display: none;
+  margin-top: 10px;
+}
+
+.strength-bar-track {
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strength-bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  transition: width 0.3s, background-color 0.3s;
+}
+
+.strength-label {
+  font-size: 11px;
+  font-family: var(--mono);
+  margin-top: 6px;
+  color: var(--text2);
+}
+
+.strength-rules {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.strength-rules span {
+  font-size: 11px;
+  font-family: var(--mono);
+  color: var(--text3);
+  transition: color 0.2s;
+}
+
+.strength-rules span.pass {
+  color: var(--green);
+}
+
+
+/* ─────────────────────────────────────────────────────
+   10. BUTTONS
+   ───────────────────────────────────────────────────── */
+.btn-primary {
+  width: 100%;
+  padding: 10px 0;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: var(--body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  background: var(--gold2);
+}
+
+.btn-primary:hover::before {
+  opacity: 1;
+}
+
+.btn-primary:active {
+  background: var(--gold-focus);
+  transform: scale(0.99);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   11. TOGGLE LINK
+   ───────────────────────────────────────────────────── */
+.toggle-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text2);
+  font-family: var(--body);
+}
+
+.toggle-text a {
+  color: var(--gold2);
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.toggle-text a:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   12. FOOTER
+   ───────────────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  margin-top: 28px;
+  font-size: 11px;
+  color: var(--text3);
+  font-family: var(--mono);
+  letter-spacing: 0.5px;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   13. STATUS DOTS
+   ───────────────────────────────────────────────────── */
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.status-dot {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text3);
+}
+
+.status-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px rgba(39,166,68,0.5);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+
+/* ─────────────────────────────────────────────────────
+   14. UTILITIES
+   ───────────────────────────────────────────────────── */
+.hidden {
+  display: none !important;
+}

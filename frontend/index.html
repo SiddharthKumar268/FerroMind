@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function () { var t = localStorage.getItem('ferromind_token'); if (!t) window.location.href = 'login.html'; })();
+  </script>
+  <title>FerroMind — SAIL Durgapur SMS</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+    <div id="loadScreen">
+      <div id="loadLogo">FERRO<span>MIND</span></div>
+      <div id="loadBar"></div>
+      <div id="loadPercent">0%</div>
+      <div id="loadSub">SAIL Durgapur · SMS · Initialising</div>
+    </div>
+    <header>
+      <div class="h-logo">FERRO<span style="color:var(--text)">MIND</span><em>SAIL Durgapur · SMS</em></div>
+      <nav class="h-tabs">
+        <button class="h-tab active" onclick="switchTab('dashboard')">Dashboard</button>
+        <button class="h-tab" onclick="switchTab('predict')">Predict</button>
+        <button class="h-tab" onclick="switchTab('optimise')">Optimise</button>
+        <button class="h-tab" onclick="switchTab('analytics')">Analytics</button>
+        <button class="h-tab" onclick="switchTab('metrics')">Metrics</button>
+        <button class="h-tab" onclick="switchTab('recent')">Recent</button>
+      </nav>
+
+      <div class="h-right">
+        <div class="api-badge">
+          <div class="api-dot" id="statusDot"></div>
+          <span id="statusText">Connecting...</span>
+        </div>
+        <div class="api-badge" style="margin-left:6px;opacity:.7">
+          <span id="dataDateText" style="font-size:9px;letter-spacing:.5px;color:var(--text3)">Data: —</span>
+        </div>
+        <span class="h-user" id="userNameText"></span>
+        <button class="btn-logout" onclick="handleLogout()">Logout</button>
+      </div>
+    </header>
+
+    <!-- ═══ ERROR BANNER ═══ -->
+    <main>
+      <div id="errorBanner" class="error-banner"></div>
+
+      <!-- ═══ KPI STRIP ═══ -->
+      <div class="kpi-strip">
+        <div class="kpi gold">
+          <div class="kpi-label">Total Heats</div>
+          <div class="kpi-val" id="kpiHeats">47,421</div>
+          <div class="kpi-sub">FY 2023–24 to 2025–26</div>
+        </div>
+        <div class="kpi green">
+          <div class="kpi-label">Mn R² · XGBoost</div>
+          <div class="kpi-val" id="kpiMnR2">0.965</div>
+          <div class="kpi-sub">Primary target element</div>
+        </div>
+        <div class="kpi blue">
+          <div class="kpi-label">C R² · XGBoost</div>
+          <div class="kpi-val" id="kpiCR2">0.922</div>
+          <div class="kpi-sub">Log-transformed target</div>
+        </div>
+        <div class="kpi purple">
+          <div class="kpi-label">FA Optimiser</div>
+          <div class="kpi-val">LIVE</div>
+          <div class="kpi-sub">12,896 candidates/search</div>
+        </div>
+      </div>
+
+      <!-- ═══ DASHBOARD TAB ═══ -->
+      <div class="tab-panel active" id="tab-dashboard">
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Actual vs Predicted Mn · Recent Heats</div>
+              <div class="card-desc">XGBoost on last 50 test heats</div>
+            </div>
+            <canvas id="chartMnTrend"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Grade Distribution · Top 10</div>
+              <div class="card-desc">Heat count by BOF grade code</div>
+            </div>
+            <canvas id="chartGradeDist"></canvas>
+          </div>
+        </div>
+        <div class="grid-full card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div class="card-title">Total FA Ladle vs Final Mn</div>
+            <div class="card-desc">Scatter — positive correlation between ferro-alloy dose and Mn content</div>
+          </div>
+          <canvas id="chartFAScatter" style="max-height:260px"></canvas>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">RMSE by Element · XGBoost</div>
+            </div>
+            <canvas id="chartRMSE"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">R² Comparison · All Models</div>
+            </div>
+            <canvas id="chartR2Compare"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ PREDICT TAB ═══ -->
+      <div class="tab-panel" id="tab-predict">
+        <div class="predict-wrap">
+          <div class="model-pills">
+            <button class="model-pill active" onclick="setModel('xgboost_composition',this)">XGBoost</button>
+            <button class="model-pill" onclick="setModel('lightgbm_composition',this)">LightGBM</button>
+            <button class="model-pill" onclick="setModel('random_forest',this)">Random Forest</button>
+            <button class="model-pill" onclick="setModel('linear_regression',this)">Linear Regression</button>
+          </div>
+          <div class="comp-grid" id="compGrid">
+            <div class="comp-cell" id="comp-Mn">
+              <div class="comp-elem">Mn</div>
+              <div class="comp-val loading" id="val-Mn">—</div>
+              <div class="comp-unit">wt%</div>
+              <div class="comp-range" id="rng-Mn">0.60 – 0.80</div>
+            </div>
+            <div class="comp-cell" id="comp-Si">
+              <div class="comp-elem">Si</div>
+              <div class="comp-val loading" id="val-Si">—</div>
+              <div class="comp-unit">wt%</div>
+              <div class="comp-range" id="rng-Si">0.15 – 0.30</div>
+            </div>
+            <div class="comp-cell" id="comp-C">
+              <div class="comp-elem">C</div>
+              <div class="comp-val loading" id="val-C">—</div>
+              <div class="comp-unit">wt%</div>
+              <div class="comp-range" id="rng-C">0.10 – 0.22</div>
+            </div>
+            <div class="comp-cell" id="comp-S">
+              <div class="comp-elem">S</div>
+              <div class="comp-val loading" id="val-S">—</div>
+              <div class="comp-unit">wt%</div>
+              <div class="comp-range" id="rng-S">0.00 – 0.035</div>
+            </div>
+            <div class="comp-cell" id="comp-P">
+              <div class="comp-elem">P</div>
+              <div class="comp-val loading" id="val-P">—</div>
+              <div class="comp-unit">wt%</div>
+              <div class="comp-range" id="rng-P">0.00 – 0.025</div>
+            </div>
+          </div>
+          <div class="predict-actions">
+            <button class="btn-predict" onclick="runPredict()">⚡ Predict Composition</button>
+            <button class="btn-optimise" onclick="runOptimise()">◎ Optimise FA Dose</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ OPTIMISE TAB ═══ -->
+      <div class="tab-panel" id="tab-optimise">
+        <div class="opt-wrap">
+          <div style="margin-bottom:16px">
+            <div class="section-head">Target Ranges</div>
+            <div class="target-chips">
+              <div class="target-chip"><span class="chip-label">Mn</span><input class="chip-input" id="tgt_mn"
+                  value="0.6 - 0.8"></div>
+              <div class="target-chip"><span class="chip-label">Si</span><input class="chip-input" id="tgt_si"
+                  value="0.15 - 0.3"></div>
+              <div class="target-chip"><span class="chip-label">C</span><input class="chip-input" id="tgt_c"
+                  value="0.1 - 0.22"></div>
+              <div class="target-chip"><span class="chip-label">S</span><input class="chip-input" id="tgt_s"
+                  value="0.0 - 0.035"></div>
+              <div class="target-chip"><span class="chip-label">P</span><input class="chip-input" id="tgt_p"
+                  value="0.0 - 0.025"></div>
+              <div class="target-chip"><span class="chip-label"
+                  style="color:var(--text2);font-size:12px">Step</span><input class="chip-input" id="optStep"
+                  value="100" style="width:60px"></div>
+            </div>
+          </div>
+          <button class="btn-predict" onclick="runOptimise()" style="margin-bottom:20px;width:100%">◎ Find Minimum FA
+            Dose</button>
+          <div id="optResult">
+            <div class="loading-text">Click above to search optimal ferro-alloy combination.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ ANALYTICS TAB ═══ -->
+      <div class="tab-panel" id="tab-analytics">
+        <div class="analytics-kpis">
+          <div class="a-kpi">
+            <div class="a-kpi-label">Best Model</div>
+            <div class="a-kpi-val gd" id="akpiBestModel">—</div>
+            <div class="a-kpi-sub" id="akpiBestModelSub">—</div>
+          </div>
+          <div class="a-kpi">
+            <div class="a-kpi-label">Best Mn R²</div>
+            <div class="a-kpi-val gn" id="akpiBestR2">—</div>
+            <div class="a-kpi-sub" id="akpiBestR2Sub">—</div>
+          </div>
+          <div class="a-kpi">
+            <div class="a-kpi-label">Test Heats</div>
+            <div class="a-kpi-val wh" id="akpiTotalHeats">—</div>
+            <div class="a-kpi-sub">Test dataset</div>
+          </div>
+          <div class="a-kpi">
+            <div class="a-kpi-label">Grades</div>
+            <div class="a-kpi-val bl" id="akpiGradeCount">—</div>
+            <div class="a-kpi-sub">Unique grades</div>
+          </div>
+          <div class="a-kpi">
+            <div class="a-kpi-label">Elements</div>
+            <div class="a-kpi-val bl">5</div>
+            <div class="a-kpi-sub">Mn · Si · C · S · P</div>
+          </div>
+        </div>
+
+        <div class="section-head">§1 — Prediction Accuracy</div>
+        <div class="grid-full card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div class="card-title">Actual vs Predicted Mn · Last 50 Heats</div>
+            <div class="card-desc">XGBoost on test dataset</div>
+          </div>
+          <canvas id="chartMnMonthly" style="max-height:280px"></canvas>
+          <div class="insight"><strong>Insight:</strong> Model tracks actual Mn closely with MAE ~0.01 wt%. Stable
+            performance across all heat types.</div>
+        </div>
+
+        <div class="section-head">§2 — Error Analysis</div>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">RMSE by Element · XGBoost</div>
+            </div>
+            <canvas id="chartRMSE2"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Mn Prediction Error Distribution</div>
+            </div>
+            <canvas id="chartMnErrorDist"></canvas>
+          </div>
+        </div>
+
+        <div class="section-head">§3 — Model Comparison</div>
+        <div class="grid-full card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div class="card-title">R² Comparison · All Models & Elements</div>
+          </div>
+          <canvas id="chartR2Compare2" style="max-height:300px"></canvas>
+          <div class="insight"><strong>Key Finding:</strong> XGBoost and LightGBM dominate Mn and C (R²>0.92). Si, S, P
+            remain hard — governed by slag chemistry not captured in current features.</div>
+        </div>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Radar · Mn & C R² Across Models</div>
+            </div>
+            <canvas id="chartRadar"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">XGBoost — Element Summary</div>
+            </div>
+            <table class="metrics-summary-table" id="metricsTableSummary">
+              <thead>
+                <tr>
+                  <th>El</th>
+                  <th>RMSE</th>
+                  <th>MAE</th>
+                  <th>R²</th>
+                  <th>Rating</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="section-head">§4 — Data Distribution</div>
+        <div class="grid-2" style="margin-bottom:16px">
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Grade Heat Count · Top 10</div>
+            </div>
+            <canvas id="chartGradeDist2"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-head">
+              <div class="card-title">Grade Proportion · Doughnut</div>
+            </div>
+            <canvas id="chartGradeDoughnut"></canvas>
+          </div>
+        </div>
+        <div class="grid-full card" style="margin-bottom:16px">
+          <div class="card-head">
+            <div class="card-title">FA Dose vs Final Mn · Scatter</div>
+          </div>
+          <canvas id="chartFAScatter2" style="max-height:280px"></canvas>
+          <div class="insight"><strong>Observation:</strong> Clear positive correlation up to ~2000 kg, after which
+            diminishing returns appear. Validates the FA optimiser approach.</div>
+        </div>
+      </div>
+
+      <!-- ═══ METRICS TAB ═══ -->
+      <div class="tab-panel" id="tab-metrics">
+        <div class="section-head">R² by Model & Element</div>
+        <div class="model-grid" id="metricsGrid">
+          <div class="loading-text"><span class="spinner"></span>Loading metrics...</div>
+        </div>
+        <div class="section-head">Per-Grade RMSE</div>
+        <div class="card" id="gradeTable">
+          <div class="loading-text">Loading...</div>
+        </div>
+      </div>
+
+      <!-- ═══ RECENT TAB ═══ -->
+      <div class="tab-panel" id="tab-recent">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="section-head" style="margin:0;border:none;padding:0">Last 20 Heats — Predicted vs Actual</div>
+          <button onclick="loadRecent()"
+            style="padding:6px 14px;background:transparent;border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text2);font-family:var(--mono);font-size:10px;letter-spacing:1px;cursor:pointer;transition:all .2s"
+            onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'"
+            onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--text2)'">REFRESH</button>
+        </div>
+        <div class="card" id="recentTable">
+          <div class="loading-text"><span class="spinner"></span>Loading...</div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ═══ DRAWER ═══ -->
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+    <div class="drawer" id="drawer">
+      <div class="drawer-head">
+        <div class="drawer-title">HEAT INPUT</div>
+        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+      </div>
+      <div class="drawer-body">
+        <div>
+          <div class="drawer-section-label">Model Selection</div>
+          <div class="d-field">
+            <label>Active Model</label>
+            <select id="modelSelect">
+              <option value="xgboost_composition">XGBoost</option>
+              <option value="lightgbm_composition">LightGBM</option>
+              <option value="random_forest">Random Forest</option>
+              <option value="linear_regression">Linear Regression</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="drawer-section-label">Heat Parameters</div>
+          <div class="d-field"><label>Grade</label><select id="gradeSelect">
+              <option value="0">Loading...</option>
+            </select></div>
+          <div class="d-field"><label>FEMN Into Ladle (kg)</label><input type="number" id="femn" value="400" min="0"
+              max="3000" step="50"></div>
+          <div class="d-field"><label>SIMN Into Ladle (kg)</label><input type="number" id="simn" value="1674" min="0"
+              max="3000" step="50"></div>
+          <div class="d-field"><label>FESI Into Ladle (kg)</label><input type="number" id="fesi" value="260" min="0"
+              max="2000" step="50"></div>
+          <div class="d-field"><label>HM Weight (kg)</label><input type="number" id="hmwt" value="155000" min="100000"
+              max="200000" step="1000"></div>
+          <div class="d-field"><label>O2 Mainblow (Nm³)</label><input type="number" id="o2" value="9000" min="5000"
+              max="15000" step="100"></div>
+          <div class="d-field"><label>HM Si (%)</label><input type="number" id="hmsi" value="0.65" min="0.1" max="1.5"
+              step="0.01"></div>
+          <div class="d-field"><label>HM P (%)</label><input type="number" id="hmp" value="0.12" min="0.05" max="0.3"
+              step="0.005"></div>
+          <div class="d-field"><label>HM S (%)</label><input type="number" id="hms" value="0.035" min="0.01" max="0.1"
+              step="0.005"></div>
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn-drawer-predict" onclick="runPredict();closeDrawer()">⚡ Predict</button>
+        <button class="btn-drawer-opt" onclick="runOptimise();closeDrawer()">◎ Optimise</button>
+      </div>
+    </div>
+
+    <!-- ═══ FAB ═══ -->
+    <button class="fab pulse" id="fab" onclick="openDrawer()" title="Configure Heat Input">
+      ⚙
+      <span class="fab-tip">Configure Heat Input</span>
+    </button>
+
+    <!-- ═══ TOAST CONTAINER ═══ -->
+    <div id="toastContainer"></div>
+
+    <script>
+      // ── JWT Fetch Interceptor ──
+      const _fetch = window.fetch;
+      window.fetch = async function (...args) {
+        let [res, cfg] = args;
+        const tok = localStorage.getItem('ferromind_token');
+        if (tok) { cfg = cfg || {}; cfg.headers = cfg.headers || {}; if (!(cfg.headers instanceof Headers)) cfg.headers['Authorization'] = `Bearer ${tok}`; }
+        const r = await _fetch(res, cfg);
+        if (r.status === 401) { localStorage.removeItem('ferromind_token'); localStorage.removeItem('ferromind_user'); window.location.href = 'login.html'; }
+        return r;
+      };
+
+      // ── Init ──
+      document.addEventListener('DOMContentLoaded', () => {
+        const u = localStorage.getItem('ferromind_user') || 'User';
+        document.getElementById('userNameText').textContent = '👤 ' + u;
+      });
+      function handleLogout() { localStorage.removeItem('ferromind_token'); localStorage.removeItem('ferromind_user'); window.location.href = 'login.html'; }
+
+      const API = '/api';
+      let _activeModel = 'xgboost_composition';
+
+      function showError(msg) {
+        const e = document.getElementById('errorBanner'); e.textContent = msg; e.style.display = 'block'; setTimeout(() => e.style.display = 'none', 6000);
+        if (typeof showToast === 'function') showToast(msg, 'error', 5000);
+      }
+
+      // ── Tab switching ──
+      function switchTab(name) {
+        document.querySelectorAll('.h-tab').forEach((t, i) => {
+          const tabs = ['dashboard', 'predict', 'optimise', 'analytics', 'metrics', 'recent'];
+          t.classList.toggle('active', tabs[i] === name);
+        });
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+        if (name === 'metrics') loadMetrics();
+        if (name === 'recent') loadRecent();
+        if (name === 'analytics') loadAnalytics();
+      }
+
+      // ── Model selection ──
+      function setModel(val, el) {
+        _activeModel = val;
+        document.getElementById('modelSelect').value = val;
+        document.querySelectorAll('.model-pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+      }
+
+      // ── Drawer ──
+      function openDrawer() {
+        document.getElementById('drawer').classList.add('open');
+        document.getElementById('drawerOverlay').classList.add('open');
+        document.getElementById('fab').classList.remove('pulse');
+      }
+      function closeDrawer() {
+        document.getElementById('drawer').classList.remove('open');
+        document.getElementById('drawerOverlay').classList.remove('open');
+      }
+
+      function parseRange(str) { const p = str.split('-').map(s => parseFloat(s.trim())); return p.length === 2 ? p : [0, p[0]]; }
+
+      function buildHeat() {
+        const femn = parseFloat(document.getElementById('femn').value) || 0;
+        const simn = parseFloat(document.getElementById('simn').value) || 0;
+        const fesi = parseFloat(document.getElementById('fesi').value) || 0;
+        const hmwt = parseFloat(document.getElementById('hmwt').value) || 155000;
+        const o2 = parseFloat(document.getElementById('o2').value) || 9000;
+        const hmsi = parseFloat(document.getElementById('hmsi').value) || 0.65;
+        const hmp = parseFloat(document.getElementById('hmp').value) || 0.12;
+        const hms = parseFloat(document.getElementById('hms').value) || 0.035;
+        const grade = parseInt(document.getElementById('gradeSelect').value) || 0;
+        const scrap = 20000, lime = 8000, dolo = 2000;
+        return {
+          'FEMN Into Ladle': femn, 'SIMN Into Ladle': simn, 'FESI Into Ladle': fesi,
+          'Hot Metal Addn. Weight': hmwt, 'Scrap Addn. Weight': scrap,
+          'Lime Into Converter': lime, 'Dolomite Into Converter': dolo,
+          'Lime Into Ladle': 500, 'Iron Ore Into Converter': 1000,
+          'Measered O2 Mainblow II': o2, 'Measered O2 2nd Blow': 800,
+          'Duration of Mainblow I/II': 14.5,
+          'HM_P': hmp, 'HM_S': hms, 'HM_Si': hmsi, 'Grade_Encoded': grade,
+          'Total_FA_Ladle': femn + simn + fesi,
+          'HM_Ratio': hmwt / (hmwt + scrap),
+          'O2_per_ton_HM': o2 / (hmwt / 1000),
+          'Lime_Dolo_Ratio': lime / (dolo + .001),
+          'SiMn_FA_Fraction': simn / (femn + simn + fesi + .001),
+        };
+      }
+
+      // ── Helper: format ISO date for display ──
+      function fmtDate(iso) {
+        if (!iso) return '—';
+        const d = new Date(iso);
+        const pad = n => String(n).padStart(2, '0');
+        return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+      }
+
+      // ── API Status ──
+      let _statusFirstRun = true;
+      async function checkStatus() {
+        try {
+          const r = await fetch(API + '/status', { signal: AbortSignal.timeout(3000) });
+          const d = await r.json();
+          document.getElementById('statusDot').className = 'api-dot live';
+          const pyStatus = d.python_ready ? 'MODEL READY' : 'MODEL LOADING';
+          document.getElementById('statusText').textContent = pyStatus + ' · ' + d.models_loaded.length + ' models';
+          // Show data date
+          if (d.data_loaded_at) {
+            document.getElementById('dataDateText').textContent = 'Data: ' + fmtDate(d.data_loaded_at);
+          } else if (d.served_at) {
+            document.getElementById('dataDateText').textContent = 'Server: ' + fmtDate(d.served_at);
+          }
+          if (_statusFirstRun && typeof showToast === 'function') {
+            showToast('API connected — ' + d.models_loaded.length + ' models loaded', 'success', 3000);
+            _statusFirstRun = false;
+          }
+          loadGrades(); loadMetrics(); loadRecent();
+        } catch {
+          document.getElementById('statusDot').className = 'api-dot err';
+          document.getElementById('statusText').textContent = 'API OFFLINE';
+          showError('Cannot reach API — make sure Express server is running');
+        }
+      }
+
+      async function loadGrades() {
+        try {
+          const r = await fetch(API + '/grades');
+          const d = await r.json();
+          const sel = document.getElementById('gradeSelect');
+          sel.innerHTML = d.grades.map((g, i) => `<option value="${i}">${g}</option>`).join('');
+        } catch { }
+      }
+
+      // ── Predict ──
+      async function runPredict() {
+        const model = document.getElementById('modelSelect').value || _activeModel;
+        const heat = buildHeat();
+        const targets = {
+          Mn: parseRange(document.getElementById('tgt_mn').value),
+          Si: parseRange(document.getElementById('tgt_si').value),
+          C: parseRange(document.getElementById('tgt_c').value),
+          S: parseRange(document.getElementById('tgt_s').value),
+          P: parseRange(document.getElementById('tgt_p').value),
+        };
+        ['Mn', 'Si', 'C', 'S', 'P'].forEach(e => {
+          const v = document.getElementById('val-' + e);
+          if (v) { v.textContent = '…'; v.className = 'comp-val loading'; }
+          const c = document.getElementById('comp-' + e);
+          if (c) c.className = 'comp-cell';
+        });
+        switchTab('predict');
+        const toastId = typeof showToast === 'function' ? showToast('Running ' + model.replace('_', ' ') + ' prediction…', 'loading') : null;
+        try {
+          const r = await fetch(API + '/predict', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ heat, model }) });
+          const d = await r.json();
+          if (d.error) { if (toastId) updateToast(toastId, d.error, 'error'); else showError(d.error); return; }
+          let passCount = 0;
+          const totalElems = Object.keys(d.composition).length;
+          Object.entries(d.composition).forEach(([elem, val], i) => {
+            setTimeout(() => {
+              const cell = document.getElementById('comp-' + elem);
+              const valEl = document.getElementById('val-' + elem);
+              if (!cell || !valEl) return;
+              valEl.textContent = val.toFixed(5);
+              valEl.className = 'comp-val';
+              const tgt = targets[elem] || [0, 1];
+              const pass = val >= tgt[0] && val <= tgt[1];
+              if (pass) passCount++;
+              cell.className = 'comp-cell ' + (pass ? 'pass' : 'fail');
+              let badge = cell.querySelector('.comp-badge');
+              if (!badge) { badge = document.createElement('div'); cell.appendChild(badge); }
+              badge.className = 'comp-badge ' + (pass ? 'pass' : 'fail');
+              badge.textContent = pass ? 'PASS' : 'FAIL';
+            }, i * 80);
+          });
+          setTimeout(() => {
+            if (toastId) updateToast(toastId, 'Prediction complete — ' + passCount + '/' + totalElems + ' elements in range', 'success');
+          }, totalElems * 80 + 100);
+          document.getElementById('fab').classList.remove('pulse');
+        } catch (e) {
+          if (toastId) updateToast(toastId, 'Prediction failed: ' + e.message, 'error');
+          else showError('Prediction failed: ' + e.message);
+        }
+      }
+
+      // ── Optimise ──
+      async function runOptimise() {
+        const model = document.getElementById('modelSelect').value || _activeModel;
+        const heat = buildHeat();
+        const step = parseInt(document.getElementById('optStep').value) || 100;
+        const targets = {
+          Mn: parseRange(document.getElementById('tgt_mn').value),
+          Si: parseRange(document.getElementById('tgt_si').value),
+          C: parseRange(document.getElementById('tgt_c').value),
+          S: parseRange(document.getElementById('tgt_s').value),
+          P: parseRange(document.getElementById('tgt_p').value),
+        };
+        const el = document.getElementById('optResult');
+        const candidateCount = ((2500 / step) * (3000 / step) * (1500 / step)).toLocaleString();
+        el.innerHTML = `<div class="loading-text"><span class="spinner"></span>Searching ${candidateCount} candidates...</div>`;
+        switchTab('optimise');
+        const toastId = typeof showToast === 'function' ? showToast('Searching ' + candidateCount + ' FA combinations…', 'loading') : null;
+        try {
+          const r = await fetch(API + '/optimise', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ heat, targets, step, model }) });
+          const d = await r.json();
+          if (!d.feasible) {
+            el.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:12px;padding:16px 0">${d.message || 'No feasible solution found.'}</div>`;
+            if (toastId) updateToast(toastId, d.message || 'No feasible solution found', 'error');
+            return;
+          }
+          const curr = parseFloat(document.getElementById('femn').value) + parseFloat(document.getElementById('simn').value) + parseFloat(document.getElementById('fesi').value);
+          const saving = curr - d.Total_FA;
+          el.innerHTML = `
+      <div class="opt-grid">
+        <div class="opt-cell"><div class="opt-fa-name">FEMN INTO LADLE</div><div class="opt-fa-val">${d['FEMN Into Ladle']}<span class="opt-fa-unit">kg</span></div></div>
+        <div class="opt-cell"><div class="opt-fa-name">SIMN INTO LADLE</div><div class="opt-fa-val">${d['SIMN Into Ladle']}<span class="opt-fa-unit">kg</span></div></div>
+        <div class="opt-cell"><div class="opt-fa-name">FESI INTO LADLE</div><div class="opt-fa-val">${d['FESI Into Ladle']}<span class="opt-fa-unit">kg</span></div></div>
+      </div>
+      <div class="opt-saving">
+        <div><div class="opt-saving-label">TOTAL FA RECOMMENDED</div><div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:3px">vs ${curr} kg current</div></div>
+        <div style="text-align:right"><div class="opt-saving-val">${d.Total_FA} kg</div>${saving > 0 ? `<div style="font-family:var(--mono);font-size:10px;color:var(--green)">SAVE ${saving} kg</div>` : ''}</div>
+      </div>
+      <div class="section-head">Predicted vs Target</div>
+      <div class="comp-grid">
+        ${Object.entries(d.composition || d.predicted || {}).map(([elem, val]) => {
+            const tgt = targets[elem] || [0, 1]; const pass = val >= tgt[0] && val <= tgt[1];
+            return `<div class="comp-cell ${pass ? 'pass' : 'fail'}">
+            <div class="comp-elem">${elem}</div>
+            <div class="comp-val">${val.toFixed(5)}</div>
+            <div class="comp-unit">wt%</div>
+            <div class="comp-range">${tgt[0]}–${tgt[1]}</div>
+            <div class="comp-badge ${pass ? 'pass' : 'fail'}">${pass ? 'PASS' : 'FAIL'}</div>
+          </div>`;
+          }).join('')}
+      </div>`;
+          if (toastId) updateToast(toastId, 'Optimal dose found — ' + d.Total_FA + ' kg total' + (saving > 0 ? ' (save ' + saving + ' kg)' : ''), 'success');
+        } catch (e) {
+          el.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:12px">Error: ${e.message}</div>`;
+          if (toastId) updateToast(toastId, 'Optimisation failed: ' + e.message, 'error');
+        }
+      }
+
+      // ── Metrics ──
+      async function loadMetrics() {
+        try {
+          const r = await fetch(API + '/metrics'); const d = await r.json(); if (d.error) return;
+          const elems = ['Mn', 'Si', 'C', 'S', 'P'];
+          const modelMap = { 'xgboost_composition': 'XGBoost', 'lightgbm_composition': 'LightGBM', 'random_forest': 'Random Forest', 'linear_regression': 'Linear Reg' };
+          const am = document.getElementById('modelSelect').value;
+          const grid = document.getElementById('metricsGrid');
+          const dateHeader = d.data_loaded_at ? `<div style="grid-column:1/-1;font-family:var(--mono);font-size:10px;color:var(--text3);padding:6px 0 12px;display:flex;justify-content:space-between"><span>Data loaded: ${fmtDate(d.data_loaded_at)}</span><span>Served: ${fmtDate(d.served_at)}</span></div>` : '';
+          grid.innerHTML = dateHeader + Object.entries(d.model_metrics).map(([mk, metrics]) => {
+            const label = modelMap[mk] || mk; const isActive = mk === am;
+            return `<div class="model-card ${isActive ? 'active' : ''}">
+        <div class="model-name">${label}</div>
+        ${elems.map(e => {
+              const m = metrics[e] || {}; const r2 = m.r2 !== undefined ? m.r2 : '—'; const cls = typeof r2 === 'number' ? r2 >= 0.7 ? 'good' : r2 >= 0.3 ? 'ok' : 'poor' : 'poor';
+              return `<div class="metric-row"><span class="metric-elem">${e}</span><span class="metric-r2 ${cls}">${typeof r2 === 'number' ? r2.toFixed(4) : r2}</span></div>`;
+            }).join('')}
+      </div>`;
+          }).join('');
+          const xgb = d.model_metrics['xgboost_composition'] || {};
+          if (xgb.Mn) document.getElementById('kpiMnR2').textContent = xgb.Mn.r2.toFixed(3);
+          if (xgb.C) document.getElementById('kpiCR2').textContent = xgb.C.r2.toFixed(3);
+          if (d.per_grade && d.per_grade.length > 0) {
+            const gt = document.getElementById('gradeTable');
+            gt.innerHTML = `<div class="table-wrap"><table class="heat-table">
+        <thead><tr><th>Grade</th><th>Heats</th><th>Mn RMSE</th><th>Si RMSE</th><th>C RMSE</th><th>S RMSE</th><th>P RMSE</th></tr></thead>
+        <tbody>${d.per_grade.map(g => `<tr>
+          <td><span class="grade-pill">${g.grade}</span></td>
+          <td>${g.n_heats}</td>
+          <td>${g.rmse_mn.toFixed(5)}</td><td>${g.rmse_si.toFixed(5)}</td>
+          <td>${g.rmse_c.toFixed(5)}</td><td>${g.rmse_s.toFixed(5)}</td><td>${g.rmse_p.toFixed(5)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;
+          }
+          if (typeof showToast === 'function') showToast('Metrics loaded', 'info', 2000);
+        } catch { }
+      }
+
+      // ── Recent ──
+      async function loadRecent() {
+        const model = document.getElementById('modelSelect').value || 'xgboost_composition';
+        const el = document.getElementById('recentTable');
+        el.innerHTML = `<div class="loading-text"><span class="spinner"></span>Loading...</div>`;
+        try {
+          const r = await fetch(`${API}/recent?n=20&model=${model}`); const d = await r.json();
+          if (d.error) { el.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:12px;padding:16px">${d.error}</div>`; return; }
+          const elems = ['Mn', 'C', 'S', 'P'];
+          const dateInfo = d.data_loaded_at ? `<div style="font-family:var(--mono);font-size:10px;color:var(--text3);padding:8px 12px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between"><span>Data loaded: ${fmtDate(d.data_loaded_at)}</span><span>Served: ${fmtDate(d.served_at)}</span></div>` : '';
+          el.innerHTML = `${dateInfo}<div class="table-wrap"><table class="heat-table">
+      <thead><tr><th>Heat No.</th><th>Grade</th>${elems.flatMap(e => [`<th>${e} Pred</th>`, `<th>${e} Act</th>`]).join('')}</tr></thead>
+      <tbody>${d.heats.map(h => `<tr>
+        <td style="color:var(--text);font-weight:500">${h.heat_number}</td>
+        <td><span class="grade-pill">${h.grade}</span></td>
+        ${elems.flatMap(e => {
+            const pred = h.predicted[e], act = h.actual[e];
+            const diff = (pred !== null && act !== null) ? Math.abs(pred - act) : null;
+            const cls = diff !== null ? (diff < 0.01 ? 'diff-good' : diff < 0.03 ? '' : 'diff-bad') : '';
+            return [`<td class="${cls}">${pred !== null ? pred.toFixed(4) : '—'}</td>`, `<td style="color:var(--text2)">${act !== null ? act.toFixed(4) : '—'}</td>`];
+          }).join('')}
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+          if (typeof showToast === 'function') showToast(d.heats.length + ' recent heats loaded', 'info', 2000);
+        } catch (e) { el.innerHTML = `<div style="color:var(--red);font-family:var(--mono);font-size:12px;padding:16px">${e.message}</div>`; }
+      }
+
+      // ── Analytics ──
+      let analyticsLoaded = false;
+      const CI = {};
+      const TC = '#62666d', GC = 'rgba(35,37,42,0.8)';
+      const TT = { backgroundColor: '#1a1c22', titleColor: '#f7f8f8', bodyColor: '#8a8f98', borderColor: '#23252a', borderWidth: 1, padding: 10 };
+      const MF = { family: "'JetBrains Mono', monospace", size: 11 };
+
+      // Chart instance registry — destroy before recreating
+      const _charts = {};
+      function mkChart(id, config) {
+        if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+        const el = document.getElementById(id);
+        if (!el) return null;
+        _charts[id] = new Chart(el, config);
+        return _charts[id];
+      }
+
+      // Show skeleton placeholders in analytics canvases
+      function showAnalyticsSkeletons() {
+        const ids = ['chartMnMonthly','chartRMSE2','chartMnErrorDist','chartR2Compare2','chartRadar','chartGradeDist2','chartGradeDoughnut','chartFAScatter2'];
+        ids.forEach(id => {
+          const canvas = document.getElementById(id);
+          if (canvas && canvas.parentElement) {
+            const existing = canvas.parentElement.querySelector('.skeleton-chart');
+            if (!existing) {
+              const skel = document.createElement('div');
+              skel.className = 'skeleton skeleton-chart';
+              canvas.parentElement.insertBefore(skel, canvas);
+              canvas.style.display = 'none';
+            }
+          }
+        });
+      }
+      function hideAnalyticsSkeletons() {
+        document.querySelectorAll('#tab-analytics .skeleton-chart').forEach(s => s.remove());
+        document.querySelectorAll('#tab-analytics canvas').forEach(c => c.style.display = '');
+      }
+
+      async function loadAnalytics() {
+        if (analyticsLoaded) return;
+        showAnalyticsSkeletons();
+        const toastId = typeof showToast === 'function' ? showToast('Loading analytics dashboard…', 'loading') : null;
+        try {
+          const r = await fetch(API + '/analytics'); const data = await r.json();
+          if (data.error) { if (toastId) updateToast(toastId, 'Analytics error: ' + data.error, 'error'); return; }
+          // Update data date in header
+          if (data.data_loaded_at) document.getElementById('dataDateText').textContent = 'Data: ' + fmtDate(data.data_loaded_at);
+          // KPIs
+          if (data.best_model) { document.getElementById('akpiBestModel').textContent = data.best_model.name; document.getElementById('akpiBestModelSub').textContent = 'Mn R² = ' + data.best_model.mn_r2; document.getElementById('akpiBestR2').textContent = data.best_model.mn_r2; document.getElementById('akpiBestR2Sub').textContent = data.best_model.name; }
+          if (data.total_heats) document.getElementById('akpiTotalHeats').textContent = data.total_heats.toLocaleString();
+          if (data.grade_dist) document.getElementById('akpiGradeCount').textContent = data.grade_dist.labels.length + '+';
+
+          const acc = data.recent_accuracy || { labels: [], actual: [], predicted: [] };
+          const sl = acc.labels.length > 30 ? acc.labels.length - 30 : 0;
+          const aL = acc.labels.slice(sl), aA = acc.actual.slice(sl), aP = acc.predicted.slice(sl);
+
+          hideAnalyticsSkeletons();
+
+          // Batch chart rendering across frames to avoid jank
+          const chartQueue = [];
+
+          // Mn Trend
+          chartQueue.push(() => mkLine('chartMnMonthly', aL, [
+            { label: 'Actual', data: aA, borderColor: '#828fff', backgroundColor: 'rgba(130,143,255,.08)', fill: true },
+            { label: 'Predicted', data: aP, borderColor: '#5e6ad2', backgroundColor: 'rgba(94,106,210,.06)', borderDash: [6, 3], fill: true }
+          ]));
+
+          // RMSE
+          const rc = data.xgb_rmse.rmse.map(v => v > 0.03 ? 'rgba(229,72,77,.4)' : v > 0.015 ? 'rgba(245,166,35,.4)' : 'rgba(39,166,68,.4)');
+          const rb = data.xgb_rmse.rmse.map(v => v > 0.03 ? '#e5484d' : v > 0.015 ? '#f5a623' : '#27a644');
+          chartQueue.push(() => {
+            mkChart('chartRMSE2', { type: 'bar', data: { labels: data.xgb_rmse.elements, datasets: [{ data: data.xgb_rmse.rmse, backgroundColor: rc, borderColor: rb, borderWidth: 1.5, borderRadius: 4, barPercentage: .55 }] }, options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => 'RMSE: ' + ctx.parsed.y.toFixed(5) } } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 14 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } });
+            mkChart('chartRMSE', { type: 'bar', data: { labels: data.xgb_rmse.elements, datasets: [{ data: data.xgb_rmse.rmse, backgroundColor: rc, borderColor: rb, borderWidth: 1.5, borderRadius: 4, barPercentage: .55 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 13 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } });
+          });
+
+          // Error dist
+          const errs = aP.map((p, i) => +(p - aA[i]).toFixed(4));
+          chartQueue.push(() => mkChart('chartMnErrorDist', { type: 'bar', data: { labels: aL, datasets: [{ data: errs, backgroundColor: errs.map(e => e >= 0 ? 'rgba(39,166,68,.4)' : 'rgba(229,72,77,.4)'), borderColor: errs.map(e => e >= 0 ? '#27a644' : '#e5484d'), borderWidth: 1, borderRadius: 2, barPercentage: .7 }] }, options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => 'Error: ' + (ctx.parsed.y >= 0 ? '+' : '') + ctx.parsed.y.toFixed(4) + ' wt%' } } }, scales: { x: { ticks: { color: TC, font: { ...MF, size: 9 }, maxRotation: 45 }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } }));
+
+          // R² compare
+          const mcolors = { 'Linear Regression': { bg: 'rgba(138,143,152,.3)', b: '#8a8f98' }, 'Random Forest': { bg: 'rgba(39,166,68,.3)', b: '#27a644' }, 'XGBoost': { bg: 'rgba(94,106,210,.4)', b: '#5e6ad2' }, 'LightGBM': { bg: 'rgba(130,143,255,.3)', b: '#828fff' } };
+          const r2ds = Object.entries(data.r2_compare.models).map(([n, v]) => ({ label: n, data: v, backgroundColor: mcolors[n]?.bg || 'rgba(255,255,255,.15)', borderColor: mcolors[n]?.b || '#8a8f98', borderWidth: 1, borderRadius: 2, barPercentage: .75 }));
+          const r2opts = { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', align: 'end', labels: { color: TC, font: MF, boxWidth: 12, padding: 14 } }, tooltip: { ...TT } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 13 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC }, min: -.1, max: 1 } } };
+          chartQueue.push(() => {
+            mkChart('chartR2Compare', { type: 'bar', data: { labels: data.r2_compare.elements, datasets: r2ds }, options: r2opts });
+            mkChart('chartR2Compare2', { type: 'bar', data: { labels: data.r2_compare.elements, datasets: r2ds }, options: r2opts });
+          });
+
+          // Radar
+          const mns = Object.keys(data.r2_compare.models);
+          chartQueue.push(() => mkChart('chartRadar', { type: 'radar', data: { labels: mns, datasets: [{ label: 'Mn R²', data: mns.map(m => data.r2_compare.models[m][0]), borderColor: '#5e6ad2', backgroundColor: 'rgba(94,106,210,.12)', borderWidth: 2, pointBackgroundColor: '#5e6ad2', pointRadius: 3 }, { label: 'C R²', data: mns.map(m => data.r2_compare.models[m][2]), borderColor: '#828fff', backgroundColor: 'rgba(130,143,255,.08)', borderWidth: 2, pointBackgroundColor: '#828fff', pointRadius: 3 }] }, options: { responsive: true, plugins: { legend: { position: 'top', labels: { color: TC, font: MF, boxWidth: 10 } }, tooltip: { ...TT } }, scales: { r: { min: 0, max: 1, ticks: { color: TC, font: { ...MF, size: 9 }, backdropColor: 'transparent', stepSize: .25 }, grid: { color: 'rgba(35,37,42,.8)' }, angleLines: { color: 'rgba(35,37,42,.8)' }, pointLabels: { color: '#8a8f98', font: { ...MF, size: 10 } } } } } }));
+
+          // Grade dist
+          const gc = data.grade_dist.counts.map((c, i) => `rgba(94,106,210,${0.2 + 0.4 * (1 - i / data.grade_dist.counts.length)})`);
+          chartQueue.push(() => {
+            mkChart('chartGradeDist2', { type: 'bar', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: gc, borderColor: '#5e6ad2', borderWidth: 1, borderRadius: 2, barPercentage: .7 }] }, options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => ctx.parsed.x.toLocaleString() + ' heats' } } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC } }, y: { ticks: { color: TC, font: { ...MF, size: 9 } }, grid: { display: false } } } } });
+            mkChart('chartGradeDist', { type: 'bar', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: gc, borderColor: '#5e6ad2', borderWidth: 1, borderRadius: 2, barPercentage: .7 }] }, options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC } }, y: { ticks: { color: TC, font: { ...MF, size: 9 } }, grid: { display: false } } } } });
+          });
+
+          // Doughnut
+          const dcs = ['#5e6ad2', '#828fff', '#27a644', '#e5484d', '#8957e5', '#2dd4bf', '#f5a623', '#f472b6', '#8a8f98', '#62666d'];
+          const tot = data.grade_dist.counts.reduce((a, b) => a + b, 0);
+          chartQueue.push(() => mkChart('chartGradeDoughnut', { type: 'doughnut', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: dcs, borderColor: '#010102', borderWidth: 2, hoverOffset: 4 }] }, options: { responsive: true, cutout: '55%', plugins: { legend: { position: 'right', labels: { color: TC, font: { ...MF, size: 10 }, boxWidth: 10, padding: 8 } }, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed.toLocaleString()} (${((ctx.parsed / tot) * 100).toFixed(1)}%)` } } } } }));
+
+          // FA Scatter
+          const scOpts = { responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => `FA: ${ctx.parsed.x} kg → Mn: ${ctx.parsed.y.toFixed(3)} wt%` } } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC }, title: { display: true, text: 'Total FA Ladle (kg)', color: TC, font: MF } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC }, title: { display: true, text: 'Mn (wt%)', color: TC, font: MF } } } };
+          const scData = { datasets: [{ label: 'Data', data: data.fa_scatter.x.map((x, i) => ({ x, y: data.fa_scatter.y[i] })), backgroundColor: 'rgba(232,160,32,.6)', borderColor: '#e8a020', borderWidth: 1.5, pointRadius: 5, pointHoverRadius: 7 }] };
+          chartQueue.push(() => {
+            mkChart('chartFAScatter', { type: 'scatter', data: scData, options: { ...scOpts, plugins: { ...scOpts.plugins, legend: { display: false } } } });
+            mkChart('chartFAScatter2', { type: 'scatter', data: scData, options: scOpts });
+          });
+
+          // Mn trend on dashboard
+          chartQueue.push(() => mkLine('chartMnTrend', aL, [
+            { label: 'Actual', data: aA, borderColor: '#1e6fbf', backgroundColor: 'rgba(30,111,191,.1)', fill: true },
+            { label: 'Predicted', data: aP, borderColor: '#e8a020', backgroundColor: 'rgba(232,160,32,.06)', borderDash: [6, 3], fill: true }
+          ]));
+
+          // Metrics table
+          const tbody = document.querySelector('#metricsTableSummary tbody');
+          if (tbody) tbody.innerHTML = data.metrics_table.map(row => {
+            const dc = row.diff.toLowerCase(); const r2v = parseFloat(row.r2);
+            const r2c = r2v >= 0.7 ? 'var(--green)' : r2v >= 0.1 ? 'var(--gold)' : 'var(--red)';
+            return `<tr><td style="color:var(--gold);font-weight:600;font-size:14px">${row.el}</td><td>${row.rmse}</td><td>${row.mae}</td><td style="color:${r2c};font-weight:600">${row.r2}</td><td><span class="diff-tag ${dc}">${row.diff.toUpperCase()}</span></td></tr>`;
+          }).join('');
+
+          // Render charts in batches across frames
+          function renderNext(i) {
+            if (i >= chartQueue.length) {
+              analyticsLoaded = true;
+              const timeMsg = data.compute_time_ms ? ` (${data.compute_time_ms}ms)` : '';
+              const cacheMsg = data.cached ? ' [cached]' : '';
+              if (toastId) updateToast(toastId, 'Analytics dashboard ready' + timeMsg + cacheMsg, 'success');
+              return;
+            }
+            requestAnimationFrame(() => {
+              chartQueue[i]();
+              renderNext(i + 1);
+            });
+          }
+          renderNext(0);
+
+        } catch (e) {
+          console.error('Analytics error:', e);
+          hideAnalyticsSkeletons();
+          if (toastId) updateToast(toastId, 'Analytics failed to load', 'error');
+        }
+      }
+
+      function mkLine(id, labels, datasets) {
+        new Chart(document.getElementById(id), { type: 'line', data: { labels, datasets: datasets.map(d => ({ ...d, borderWidth: 2, pointRadius: 3, tension: .3 })) }, options: { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', align: 'end', labels: { color: TC, font: MF, boxWidth: 12, padding: 14 } }, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(4)} wt%` } } }, scales: { x: { ticks: { color: TC, font: { ...MF, size: 9 }, maxRotation: 45 }, grid: { color: GC } }, y: { ticks: { color: TC, font: MF, callback: v => v.toFixed(2) }, grid: { color: GC } } } } });
+      }
+
+      // ── Boot ──
+      checkStatus();
+      setInterval(checkStatus, 30000);
+    </script>
+    <script src="js/animations.js"></script>
+
+    <!-- ═══ DEVELOPER CREDIT ═══ -->
+    <footer style="text-align:center;padding:18px 24px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--text3);">
+      Built by <a href="https://siddharthkumar.tech" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:none;font-weight:600;transition:all .2s;border-bottom:1px solid transparent;" onmouseover="this.style.borderBottomColor='var(--gold)';this.style.textShadow='0 0 12px rgba(232,160,32,.4)'" onmouseout="this.style.borderBottomColor='transparent';this.style.textShadow='none'">Siddharth Kumar</a> · <span style="color:var(--text3)">SAIL Durgapur · FerroMind</span>
+    </footer>
+  </body>
+
+</html>

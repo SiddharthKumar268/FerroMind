@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FerroMind · Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/login.css">
+    <!-- <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0a0c10;
+            --surface: #111318;
+            --border: #1e2330;
+            --border2: #2a3045;
+            --accent: #e8a838;
+            --accent2: #3b82f6;
+            --green: #22c55e;
+            --red: #ef4444;
+            --muted: #4a5568;
+            --text: #e2e8f0;
+            --text2: #94a3b8;
+            --mono: 'IBM Plex Mono', monospace;
+            --sans: 'IBM Plex Sans', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-wrapper {
+            width: 100%;
+            max-width: 420px;
+            padding: 0 20px;
+        }
+
+        /* ── Logo Block ── */
+        .logo-block {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .logo-text {
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 4px;
+        }
+
+        .logo-sub {
+            font-family: var(--sans);
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text2);
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── Card ── */
+        .auth-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 32px 28px 28px;
+        }
+
+        .card-title {
+            font-family: var(--sans);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title .icon {
+            font-size: 16px;
+        }
+
+        /* ── Banner (error / success) ── */
+        .banner {
+            display: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: var(--sans);
+            margin-bottom: 18px;
+            line-height: 1.45;
+        }
+
+        .banner.error {
+            display: block;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--red);
+        }
+
+        .banner.success {
+            display: block;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--green);
+        }
+
+        /* ── Form Fields ── */
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field label {
+            display: block;
+            font-family: var(--sans);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text2);
+            margin-bottom: 6px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border2);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .field input:focus {
+            border-color: var(--accent);
+        }
+
+        .field input::placeholder {
+            color: var(--muted);
+            font-family: var(--sans);
+            font-size: 13px;
+        }
+
+        /* ── Password Strength ── */
+        .strength-bar-container {
+            display: none;
+            margin-top: 8px;
+        }
+
+        .strength-bar-track {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        .strength-label {
+            font-size: 11px;
+            font-family: var(--sans);
+            margin-top: 4px;
+            color: var(--text2);
+        }
+
+        .strength-rules {
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+        }
+
+        .strength-rules span {
+            font-size: 11px;
+            font-family: var(--mono);
+            color: var(--muted);
+            transition: color 0.2s;
+        }
+
+        .strength-rules span.pass {
+            color: var(--green);
+        }
+
+        /* ── Button ── */
+        .btn-primary {
+            width: 100%;
+            padding: 11px 0;
+            background: var(--accent);
+            color: var(--bg);
+            border: none;
+            border-radius: 6px;
+            font-family: var(--sans);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 6px;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ── Toggle Link ── */
+        .toggle-text {
+            text-align: center;
+            margin-top: 18px;
+            font-size: 13px;
+            color: var(--text2);
+            font-family: var(--sans);
+        }
+
+        .toggle-text a {
+            color: var(--accent2);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .toggle-text a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            text-align: center;
+            margin-top: 36px;
+            font-size: 11px;
+            color: var(--muted);
+            font-family: var(--sans);
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Hidden helper ── */
+        .hidden {
+            display: none !important;
+        }
+    </style> -->
+</head>
+<body>
+    <div class="auth-wrapper">
+        <!-- Logo -->
+        <div class="logo-block">
+            <div class="logo-text">FERRO<span>MIND</span></div>
+            <div class="logo-sub">SAIL Durgapur · Steel Melting Shop</div>
+        </div>
+
+        <!-- Card -->
+        <div class="auth-card">
+            <!-- Title -->
+            <div class="card-title">
+                <span class="icon">🔒</span>
+                <span id="cardTitleText">Sign In</span>
+            </div>
+
+            <!-- Banner -->
+            <div id="banner" class="banner"></div>
+
+            <!-- ═══ Login Form ═══ -->
+            <form id="loginForm" novalidate autocomplete="off">
+                <div class="field">
+                    <label for="loginUser">Username</label>
+                    <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off">
+                </div>
+                <div class="field">
+                    <label for="loginPass">Password</label>
+                    <input type="password" id="loginPass" placeholder="Enter password" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn-primary" id="loginBtn">Sign In</button>
+            </form>
+
+            <!-- ═══ Register Form ═══ -->
+            <form id="registerForm" class="hidden" novalidate autocomplete="off">
+                <div class="field">
+                    <label for="regUser">Username</label>
+                    <input type="text" id="regUser" placeholder="Choose a username" autocomplete="off">
+                </div>
+                <div class="field">
+                    <label for="regPass">Password</label>
+                    <input type="password" id="regPass" placeholder="Create password" autocomplete="new-password">
+                    <!-- Strength Indicator -->
+                    <div class="strength-bar-container" id="strengthContainer">
+                        <div class="strength-bar-track">
+                            <div class="strength-bar-fill" id="strengthFill"></div>
+                        </div>
+                        <div class="strength-label" id="strengthLabel"></div>
+                        <div class="strength-rules">
+                            <span id="rule-len">✕ 8+ chars</span>
+                            <span id="rule-upper">✕ Uppercase</span>
+                            <span id="rule-digit">✕ Digit</span>
+                            <span id="rule-special">✕ Special char</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="regConfirm">Confirm Password</label>
+                    <input type="password" id="regConfirm" placeholder="Re-enter password" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn-primary" id="regBtn">Create Account</button>
+            </form>
+
+            <!-- Toggle -->
+            <div class="toggle-text" id="toggleLogin">
+                Don't have an account? <a id="toggleLink" onclick="toggleMode()">Register</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">Government of India · SAIL</div>
+    </div>
+
+    <script>
+        // ── Redirect if already authenticated ──
+        (function () {
+            var token = localStorage.getItem('ferromind_token');
+            if (token) {
+                window.location.href = 'index.html';
+            }
+        })();
+
+        // ── State ──
+        var isLogin = true;
+        var API_BASE = '/auth';
+
+        // ── DOM refs ──
+        var loginForm      = document.getElementById('loginForm');
+        var registerForm   = document.getElementById('registerForm');
+        var banner         = document.getElementById('banner');
+        var cardTitleText  = document.getElementById('cardTitleText');
+        var toggleLink     = document.getElementById('toggleLink');
+        var strengthContainer = document.getElementById('strengthContainer');
+        var strengthFill   = document.getElementById('strengthFill');
+        var strengthLabel  = document.getElementById('strengthLabel');
+        var ruleLen        = document.getElementById('rule-len');
+        var ruleUpper      = document.getElementById('rule-upper');
+        var ruleDigit      = document.getElementById('rule-digit');
+        var ruleSpecial    = document.getElementById('rule-special');
+
+        // ── Toggle Login / Register ──
+        function toggleMode() {
+            isLogin = !isLogin;
+            hideBanner();
+            if (isLogin) {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                cardTitleText.textContent = 'Sign In';
+                toggleLink.textContent = 'Register';
+                document.getElementById('toggleLogin').innerHTML =
+                    'Don\'t have an account? <a onclick="toggleMode()">Register</a>';
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                cardTitleText.textContent = 'Create Account';
+                toggleLink.textContent = 'Sign In';
+                document.getElementById('toggleLogin').innerHTML =
+                    'Already have an account? <a onclick="toggleMode()">Sign In</a>';
+            }
+        }
+
+        // ── Banner helpers ──
+        function showBanner(msg, type) {
+            banner.textContent = msg;
+            banner.className = 'banner ' + type;
+        }
+
+        function hideBanner() {
+            banner.className = 'banner';
+            banner.textContent = '';
+        }
+
+        // ── Password Strength ──
+        var regPassInput = document.getElementById('regPass');
+        regPassInput.addEventListener('input', function () {
+            var val = this.value;
+            if (val.length === 0) {
+                strengthContainer.style.display = 'none';
+                return;
+            }
+            strengthContainer.style.display = 'block';
+
+            var hasLen     = val.length >= 8;
+            var hasUpper   = /[A-Z]/.test(val);
+            var hasDigit   = /\d/.test(val);
+            var hasSpecial = /[^A-Za-z0-9]/.test(val);
+
+            setRule(ruleLen,     hasLen,     '8+ chars');
+            setRule(ruleUpper,   hasUpper,   'Uppercase');
+            setRule(ruleDigit,   hasDigit,   'Digit');
+            setRule(ruleSpecial, hasSpecial, 'Special char');
+
+            var score = [hasLen, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
+            var pct, color, label;
+            switch (score) {
+                case 0: pct = 5;   color = var_red();   label = 'Very Weak'; break;
+                case 1: pct = 25;  color = var_red();   label = 'Weak';      break;
+                case 2: pct = 50;  color = '#f59e0b';   label = 'Fair';      break;
+                case 3: pct = 75;  color = var_accent(); label = 'Good';     break;
+                case 4: pct = 100; color = var_green();  label = 'Strong';   break;
+            }
+            strengthFill.style.width = pct + '%';
+            strengthFill.style.backgroundColor = color;
+            strengthLabel.textContent = label;
+            strengthLabel.style.color = color;
+        });
+
+        function setRule(el, pass, text) {
+            el.textContent = (pass ? '✓' : '✕') + ' ' + text;
+            el.className = pass ? 'pass' : '';
+        }
+
+        function var_red()    { return '#e5484d'; }
+        function var_green()  { return '#27a644'; }
+        function var_accent() { return '#5e6ad2'; }
+
+        // ── Validate register password ──
+        function validatePassword(pw) {
+            if (pw.length < 8)           return 'Password must be at least 8 characters.';
+            if (!/[A-Z]/.test(pw))       return 'Password must contain an uppercase letter.';
+            if (!/\d/.test(pw))          return 'Password must contain a digit.';
+            if (!/[^A-Za-z0-9]/.test(pw)) return 'Password must contain a special character.';
+            return null;
+        }
+
+        // ── Login submit ──
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideBanner();
+
+            var username = document.getElementById('loginUser').value.trim();
+            var password = document.getElementById('loginPass').value;
+
+            if (!username || !password) {
+                showBanner('Please enter both username and password.', 'error');
+                return;
+            }
+
+            var btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.textContent = 'Signing in…';
+
+            try {
+                var res = await fetch(API_BASE + '/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: password })
+                });
+                var data = await res.json();
+
+                if (!res.ok || data.error) {
+                    showBanner(data.error || 'Login failed. Please try again.', 'error');
+                    document.getElementById('loginPass').value = '';
+                } else {
+                    localStorage.setItem('ferromind_token', data.token);
+                    localStorage.setItem('ferromind_user', data.username || username);
+                    window.location.href = 'index.html';
+                }
+            } catch (err) {
+                showBanner('Unable to reach server. Please check your connection.', 'error');
+                document.getElementById('loginPass').value = '';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            }
+        });
+
+        // ── Register submit ──
+        registerForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            hideBanner();
+
+            var username = document.getElementById('regUser').value.trim();
+            var password = document.getElementById('regPass').value;
+            var confirm  = document.getElementById('regConfirm').value;
+
+            if (!username || !password || !confirm) {
+                showBanner('Please fill in all fields.', 'error');
+                return;
+            }
+
+            var pwError = validatePassword(password);
+            if (pwError) {
+                showBanner(pwError, 'error');
+                return;
+            }
+
+            if (password !== confirm) {
+                showBanner('Passwords do not match.', 'error');
+                document.getElementById('regConfirm').value = '';
+                return;
+            }
+
+            var btn = document.getElementById('regBtn');
+            btn.disabled = true;
+            btn.textContent = 'Creating account…';
+
+            try {
+                var res = await fetch(API_BASE + '/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username, password: password })
+                });
+                var data = await res.json();
+
+                if (!res.ok || data.error) {
+                    showBanner(data.error || 'Registration failed. Please try again.', 'error');
+                    document.getElementById('regPass').value = '';
+                    document.getElementById('regConfirm').value = '';
+                } else {
+                    showBanner(data.message || 'Account created successfully. Please sign in.', 'success');
+                    // Clear register fields
+                    document.getElementById('regUser').value = '';
+                    document.getElementById('regPass').value = '';
+                    document.getElementById('regConfirm').value = '';
+                    strengthContainer.style.display = 'none';
+                    // Switch to login after short delay
+                    setTimeout(function () {
+                        toggleMode();
+                    }, 1500);
+                }
+            } catch (err) {
+                showBanner('Unable to reach server. Please check your connection.', 'error');
+                document.getElementById('regPass').value = '';
+                document.getElementById('regConfirm').value = '';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        });
+    </script>
+</body>
+</html>

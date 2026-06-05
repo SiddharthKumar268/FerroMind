@@ -1,0 +1,546 @@
+/* ═══════════════════════════════════════════════════════
+   FERROMIND — Animations & Transitions
+   All keyframes, entrance animations, scroll-reveal,
+   and motion effects live here.
+   
+   TABLE OF CONTENTS:
+   1. Shared Keyframes
+   2. Loading Screen
+   3. Header Entrance
+   4. Tab Transitions
+   5. KPI Entrance
+   6. Card Entrance
+   7. Scroll Reveal
+   8. Section Heads
+   9. Predict & Optimise Cells
+   10. Table Row Animations
+   11. FAB Entrance
+   12. Drawer Motion
+   13. Analytics KPI & Insight
+   14. Model Card
+   15. Toast Animations
+   16. Skeleton Shimmer
+   17. KPI Number Ticker
+   18. Canvas & Custom Cursor Layers
+   ═══════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────
+   1. SHARED KEYFRAMES
+   ───────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rowIn {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes toastIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes toastOut {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(100%); opacity: 0; }
+}
+
+@keyframes toastProgress {
+  from { width: 100%; }
+  to   { width: 0; }
+}
+
+@keyframes numTick {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+@keyframes headerIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tabIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes loadBar {
+  from { width: 0; }
+  to   { width: 100%; }
+}
+
+/* ── NEW: Glow Keyframes ──────────────────────────────── */
+
+/* Repeating soft glow pulse — used on live dot, active elements */
+@keyframes glowPulse {
+  0%   { box-shadow: 0 0 4px rgba(94,106,210,.4),  0 0 10px rgba(94,106,210,.2); }
+  50%  { box-shadow: 0 0 12px rgba(94,106,210,.7), 0 0 28px rgba(94,106,210,.35); }
+  100% { box-shadow: 0 0 4px rgba(94,106,210,.4),  0 0 10px rgba(94,106,210,.2); }
+}
+
+/* Green glow pulse — for pass cells and live status */
+@keyframes glowPulseGreen {
+  0%   { box-shadow: 0 0 4px rgba(39,166,68,.4),  0 0 10px rgba(39,166,68,.2); }
+  50%  { box-shadow: 0 0 14px rgba(39,166,68,.7), 0 0 30px rgba(39,166,68,.35); }
+  100% { box-shadow: 0 0 4px rgba(39,166,68,.4),  0 0 10px rgba(39,166,68,.2); }
+}
+
+/* Red glow pulse — for fail cells */
+@keyframes glowPulseRed {
+  0%   { box-shadow: 0 0 4px rgba(229,72,77,.4),  0 0 10px rgba(229,72,77,.2); }
+  50%  { box-shadow: 0 0 14px rgba(229,72,77,.7), 0 0 30px rgba(229,72,77,.35); }
+  100% { box-shadow: 0 0 4px rgba(229,72,77,.4),  0 0 10px rgba(229,72,77,.2); }
+}
+
+/* Animated border glow sweep — entrance for cards */
+@keyframes borderGlowIn {
+  0%   { box-shadow: none; opacity: 0; transform: translateY(10px); }
+  60%  { opacity: 1; transform: translateY(0); }
+  80%  { box-shadow: 0 0 0 1px rgba(94,106,210,.4), 0 0 20px rgba(94,106,210,.25); }
+  100% { box-shadow: none; opacity: 1; transform: translateY(0); }
+}
+
+/* KPI entrance with glow flash */
+@keyframes kpiGlowIn {
+  0%   { opacity: 0; transform: translateY(10px); box-shadow: none; }
+  70%  { opacity: 1; transform: translateY(0); }
+  85%  { box-shadow: 0 0 0 1px rgba(94,106,210,.45), 0 0 24px rgba(94,106,210,.3); }
+  100% { opacity: 1; transform: translateY(0); box-shadow: none; }
+}
+
+/* Loading logo glow entrance */
+@keyframes logoGlowIn {
+  0%   { opacity: 0; text-shadow: none; }
+  60%  { opacity: 1; text-shadow: 0 0 30px rgba(94,106,210,.9), 0 0 60px rgba(94,106,210,.4); }
+  100% { opacity: 1; text-shadow: 0 0 12px rgba(94,106,210,.3); }
+}
+
+/* Glowing progress bar for load screen */
+@keyframes loadBarGlow {
+  0%   { width: 0; box-shadow: none; }
+  50%  { box-shadow: 0 0 10px rgba(94,106,210,.8), 0 0 20px rgba(94,106,210,.4); }
+  100% { width: 100%; box-shadow: 0 0 6px rgba(94,106,210,.5); }
+}
+
+/* Live dot repeating ping */
+@keyframes liveDotPing {
+  0%   { transform: scale(1);   opacity: 1; }
+  60%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(1);   opacity: 0; }
+}
+
+
+/* ─────────────────────────────────────────────────────
+   2. LOADING SCREEN
+   ───────────────────────────────────────────────────── */
+#loadScreen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg, #010102);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  transition: opacity .4s ease;
+}
+
+#loadScreen.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#loadLogo {
+  font-family: var(--display, 'Inter', sans-serif);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.8px;
+  color: var(--text, #f7f8f8);
+  opacity: 0;
+  animation: logoGlowIn .8s ease .1s forwards;
+}
+
+#loadLogo span { color: var(--text2, #8a8f98); }
+
+#loadBar {
+  width: 180px;
+  height: 2px;
+  background: var(--border, #23252a);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+#loadBar::after {
+  content: '';
+  display: block;
+  height: 100%;
+  background: var(--gold, #5e6ad2);
+  animation: loadBarGlow 1.2s ease .3s both;
+}
+
+#loadSub {
+  font-family: var(--body, 'Inter', sans-serif);
+  font-size: 12px;
+  color: var(--text3, #62666d);
+  opacity: 0;
+  animation: fadeIn .4s ease .5s forwards;
+}
+
+#loadPercent {
+  font-family: var(--mono, 'JetBrains Mono', monospace);
+  font-size: 11px;
+  color: var(--gold, #5e6ad2);
+  opacity: 0;
+  animation: fadeIn .4s ease .4s forwards;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   3. HEADER ENTRANCE
+   ───────────────────────────────────────────────────── */
+header {
+  animation: headerIn .3s ease .2s both;
+  transition: transform .3s ease, background-color .3s ease;
+}
+
+header.scrolled   { background: rgba(1,1,2,.95); }
+header.hidden-up  { transform: translateY(-100%); transition: transform .3s ease; }
+
+
+/* ─────────────────────────────────────────────────────
+   4. TAB TRANSITIONS
+   ───────────────────────────────────────────────────── */
+.tab-panel.active {
+  animation: tabIn .2s ease both;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   5. KPI ENTRANCE
+   ───────────────────────────────────────────────────── */
+.kpi {
+  opacity: 0;
+  animation: kpiGlowIn .5s ease both;
+}
+
+.kpi:nth-child(1) { animation-delay: .15s; }
+.kpi:nth-child(2) { animation-delay: .22s; }
+.kpi:nth-child(3) { animation-delay: .29s; }
+.kpi:nth-child(4) { animation-delay: .36s; }
+
+
+/* ─────────────────────────────────────────────────────
+   6. CARD ENTRANCE
+   ───────────────────────────────────────────────────── */
+.card {
+  transition: border-color .2s ease, box-shadow .3s ease, transform .2s ease;
+}
+
+.card:not(.reveal):not(.reveal-left):not(.reveal-right) {
+  animation: borderGlowIn .5s ease both;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   7. SCROLL REVEAL
+   ───────────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-16px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(16px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* Staggered delays */
+.reveal:nth-child(1) { transition-delay: .04s; }
+.reveal:nth-child(2) { transition-delay: .08s; }
+.reveal:nth-child(3) { transition-delay: .12s; }
+.reveal:nth-child(4) { transition-delay: .16s; }
+
+
+/* ─────────────────────────────────────────────────────
+   8. SECTION HEADS
+   ───────────────────────────────────────────────────── */
+.section-head {
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.section-head.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+/* ─────────────────────────────────────────────────────
+   9. PREDICT & OPTIMISE CELLS
+   ───────────────────────────────────────────────────── */
+
+/* Composition cells */
+.comp-cell {
+  opacity: 0;
+  animation: borderGlowIn .4s ease both;
+}
+
+.comp-cell:nth-child(1) { animation-delay: .04s; }
+.comp-cell:nth-child(2) { animation-delay: .08s; }
+.comp-cell:nth-child(3) { animation-delay: .12s; }
+.comp-cell:nth-child(4) { animation-delay: .16s; }
+.comp-cell:nth-child(5) { animation-delay: .20s; }
+
+/* Badge */
+.comp-badge {
+  animation: fadeIn .2s ease both;
+}
+
+/* Optimise result cells */
+.opt-cell {
+  animation: borderGlowIn .4s ease both;
+}
+
+.opt-cell:nth-child(1) { animation-delay: .04s; }
+.opt-cell:nth-child(2) { animation-delay: .08s; }
+.opt-cell:nth-child(3) { animation-delay: .12s; }
+
+
+/* ─────────────────────────────────────────────────────
+   10. TABLE ROW ANIMATIONS
+   ───────────────────────────────────────────────────── */
+.heat-table tbody tr,
+.metrics-summary-table tbody tr {
+  opacity: 0;
+  transform: translateX(-6px);
+  animation: rowIn .25s ease both;
+  animation-play-state: paused;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   11. FAB ENTRANCE
+   ───────────────────────────────────────────────────── */
+.fab {
+  animation: fadeIn .4s ease .8s both;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   12. DRAWER MOTION
+   ───────────────────────────────────────────────────── */
+
+/* Reset drawer content on close */
+.drawer:not(.open) .d-field,
+.drawer:not(.open) .drawer-title,
+.drawer:not(.open) .drawer-close,
+.drawer:not(.open) .drawer-section-label,
+.drawer:not(.open) .btn-drawer-predict,
+.drawer:not(.open) .btn-drawer-opt {
+  opacity: 1;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   13. ANALYTICS KPI & INSIGHT
+   ───────────────────────────────────────────────────── */
+.a-kpi {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+.a-kpi.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.analytics-kpis .a-kpi:nth-child(1) { transition-delay: .04s; }
+.analytics-kpis .a-kpi:nth-child(2) { transition-delay: .08s; }
+.analytics-kpis .a-kpi:nth-child(3) { transition-delay: .12s; }
+.analytics-kpis .a-kpi:nth-child(4) { transition-delay: .16s; }
+.analytics-kpis .a-kpi:nth-child(5) { transition-delay: .20s; }
+
+.insight {
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .3s ease .2s, transform .3s ease .2s;
+}
+
+.insight.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ─────────────────────────────────────────────────────
+   14. MODEL CARD
+   ───────────────────────────────────────────────────── */
+.model-card {
+  transition: border-color .45s cubic-bezier(.4,0,.2,1), box-shadow .45s cubic-bezier(.4,0,.2,1), transform .35s cubic-bezier(.4,0,.2,1);
+}
+
+
+/* ─────────────────────────────────────────────────────
+   15. TOAST ANIMATIONS
+   ───────────────────────────────────────────────────── */
+.toast {
+  transform: translateX(100%);
+  opacity: 0;
+  animation: toastIn .3s ease forwards;
+}
+
+.toast.exiting {
+  animation: toastOut .25s ease forwards;
+}
+
+.toast-progress {
+  animation: toastProgress var(--toast-dur, 4s) linear forwards;
+}
+
+/* Loading toast — keep progress bar at 100%, spin icon */
+.toast.loading .toast-progress {
+  animation: none;
+  width: 100%;
+}
+
+.toast.loading .toast-icon {
+  display: inline-block;
+  animation: spin .8s linear infinite;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   16. SKELETON SHIMMER
+   ───────────────────────────────────────────────────── */
+.skeleton {
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   17. KPI NUMBER TICKER & SPINNER
+   ───────────────────────────────────────────────────── */
+.kpi-val {
+  overflow: hidden;
+  display: block;
+}
+
+.kpi-val.ticking {
+  animation: numTick .3s ease both;
+}
+
+.spinner {
+  animation: spin .7s linear infinite;
+}
+
+
+/* ─────────────────────────────────────────────────────
+   18. CANVAS & CUSTOM CURSOR LAYERS
+   ───────────────────────────────────────────────────── */
+#particleCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: -1;
+  pointer-events: none;
+}
+
+#cursor-dot, #cursor-ring {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+}
+
+#cursor-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--gold, #5e6ad2);
+  transition: width .2s ease, height .2s ease, background-color .2s ease;
+  box-shadow: 0 0 6px rgba(94,106,210,.6);
+}
+
+#cursor-ring {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--gold, #5e6ad2);
+  transition: width .2s ease, height .2s ease, border-color .2s ease;
+  box-shadow: 0 0 10px rgba(94,106,210,.25);
+}
+
+
+/* ─────────────────────────────────────────────────────
+   19. LIVE STATUS DOT GLOW
+   ───────────────────────────────────────────────────── */
+
+/* Live green dot — glowing ping effect */
+.api-dot.live {
+  position: relative;
+  box-shadow: 0 0 6px rgba(39,166,68,.8);
+}
+
+.api-dot.live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(39,166,68,.6);
+  animation: liveDotPing 2s ease-in-out infinite;
+}
+
+/* Error dot glow */
+.api-dot.err {
+  box-shadow: 0 0 6px rgba(229,72,77,.8);
+}

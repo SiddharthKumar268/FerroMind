@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: ferromind
+    runtime: node
+    region: oregon
+    plan: free
+    buildCommand: npm install && pip install -r requirements.txt
+    startCommand: node server/server.js
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false   # Set manually in Render dashboard
+      - key: JWT_SECRET
+        sync: false   # Set manually in Render dashboard
+      - key: JWT_EXPIRES_IN
+        value: 8h
+      - key: SESSION_SECRET
+        sync: false   # Set manually in Render dashboard
+      - key: OPENROUTER_API_KEY
+        sync: false   # Set manually in Render dashboard
