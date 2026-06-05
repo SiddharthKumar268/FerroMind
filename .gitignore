@@ -1,0 +1,35 @@
+# ── Environment secrets (NEVER commit) ──────────
+.env
+.env.local
+.env.production
+
+# ── Node ─────────────────────────────────────────
+node_modules/
+npm-debug.log*
+
+# ── Python ────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+
+# ── ML Models (large binary files) ───────────────
+# Uncomment below if models are >100MB (GitHub limit)
+# models/*.pkl
+
+# ── Data (may be large) ──────────────────────────
+# data/raw/
+# data/processed/
+
+# ── OS ────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ───────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp

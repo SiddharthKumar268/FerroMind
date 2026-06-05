@@ -1,0 +1,2 @@
+models/random_forest.pkl filter=lfs diff=lfs merge=lfs -text
+data/raw/PRAVARTANAM-HM[[:space:]]ANALYSIS.xlsx filter=lfs diff=lfs merge=lfs -text
