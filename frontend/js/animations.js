@@ -37,6 +37,7 @@ function initLoader() {
 }
 
 /* ══ 2. CUSTOM CURSOR ══ */
+/* ══ 2. CUSTOM CURSOR ══ */
 function initCursor() {
   // skip on touch-only devices
   if (window.matchMedia('(pointer: coarse)').matches) return;

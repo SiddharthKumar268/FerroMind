@@ -1,362 +1,256 @@
 /* ═══════════════════════════════════════════════════════
-   FERROMIND — Login Page
-   Uses the same Linear Design System as the dashboard.
-   Canvas #010102 · Lavender #5e6ad2 · Inter + JetBrains Mono
-   
-   TABLE OF CONTENTS:
-   1. Design Tokens (shared with dashboard)
-   2. Reset & Base
-   3. Background Effects
-   4. Auth Wrapper & Animation
-   5. Logo Block
-   6. Auth Card
-   7. Banners (Error / Success)
-   8. Form Fields
-   9. Password Strength
-   10. Buttons
-   11. Toggle Link
-   12. Footer
-   13. Status Dots
-   14. Utilities
+   FERROMIND — LOGIN PAGE
+   Obsidian black + cinematic violet glow theme
+   Matches dashboard aesthetic exactly
    ═══════════════════════════════════════════════════════ */
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ─────────────────────────────────────────────────────
-   1. DESIGN TOKENS
-   Same as dashboard.css for visual consistency
+   TOKENS (mirror of dashboard.css)
    ───────────────────────────────────────────────────── */
 :root {
-  /* Surface Ladder */
-  --bg:        #010102;
-  --s1:        #0f1114;
-  --s2:        #1a1c22;
-  --s3:        #23262d;
-  --s4:        #2c2f38;
+  --bg:     #000000;
+  --s1:     #080810;
+  --s2:     #0d0d18;
+  --s3:     #121220;
 
-  /* Hairlines */
-  --border:    #23252a;
-  --border2:   #34373e;
-  --border3:   #2a2d34;
+  --border:    rgba(120, 60, 255, 0.14);
+  --border2:   rgba(130, 70, 255, 0.25);
+  --border3:   rgba(150, 80, 255, 0.42);
+  --border-lit:rgba(160, 90, 255, 0.58);
 
-  /* Brand Accent (Linear Lavender) */
-  --gold:      #5e6ad2;
-  --gold2:     #828fff;
-  --gold-focus:#5e69d1;
+  --accent:  #7c3aed;
+  --accent2: #8b5cf6;
+  --accent3: #a78bfa;
+  --accent4: #c4b5fd;
 
-  /* Semantic Colors */
-  --green:     #27a644;
-  --green2:    #34d399;
-  --red:       #e5484d;
-  --amber:     #f5a623;
+  --green:  #10b981;
+  --green2: #34d399;
+  --red:    #ef4444;
+  --red2:   #f87171;
+  --amber:  #f59e0b;
 
-  /* Text Hierarchy */
-  --text:      #f7f8f8;
-  --text2:     #8a8f98;
-  --text3:     #62666d;
+  --text:   #ffffff;
+  --text2:  #c8c8d0;
+  --text3:  #6b6b80;
+  --text4:  #3a3a4a;
 
-  /* Fonts */
-  --mono:      'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-  --display:   'Inter', system-ui, -apple-system, sans-serif;
-  --body:      'Inter', system-ui, -apple-system, sans-serif;
-
-  /* Radius Scale */
-  --r-xs:      4px;
-  --r-sm:      8px;
-  --r:         12px;
-  --r-pill:    9999px;
+  --mono:    'JetBrains Mono', ui-monospace, monospace;
+  --display: 'Inter', system-ui, sans-serif;
 }
-
 
 /* ─────────────────────────────────────────────────────
-   2. RESET & BASE
+   BASE
    ───────────────────────────────────────────────────── */
-*, *::before, *::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; }
 
 body {
-  background: var(--bg);
+  background: #000000;
+  /* Custom purple cursor */
+  cursor: url('../../../assets/cursor.png') 32 32, auto;
+
+  /* Cinematic ambient glow — centered this time for login focus */
+  background-image:
+    radial-gradient(ellipse 70% 60% at 50% 40%,
+      rgba(100, 20, 255, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 90%,
+      rgba(80, 0, 200, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 30% at 10% 10%,
+      rgba(120, 40, 255, 0.10) 0%, transparent 50%);
+
   color: var(--text);
-  font-family: var(--body);
-  font-size: 14px;
+  font-family: var(--display);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  position: relative;
+  padding: 24px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-::selection {
-  background: rgba(94,106,210,.3);
-  color: #fff;
-}
-
+::selection { background: rgba(139,92,246,.30); color: #fff; }
 
 /* ─────────────────────────────────────────────────────
-   3. BACKGROUND EFFECTS
-   ───────────────────────────────────────────────────── */
-
-/* Subtle grid pattern */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(94,106,210,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(94,106,210,0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* Ambient glow */
-body::after {
-  content: '';
-  position: fixed;
-  top: -200px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 400px;
-  background: radial-gradient(ellipse, rgba(94,106,210,0.1) 0%, transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-
-/* ─────────────────────────────────────────────────────
-   4. AUTH WRAPPER & ANIMATION
+   WRAPPER
    ───────────────────────────────────────────────────── */
 .auth-wrapper {
   width: 100%;
-  max-width: 440px;
-  padding: 0 20px;
+  max-width: 420px;
   position: relative;
   z-index: 1;
-  animation: fadeUp 0.5s ease both;
 }
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
 
 /* ─────────────────────────────────────────────────────
-   5. LOGO BLOCK
+   LOGO BLOCK
    ───────────────────────────────────────────────────── */
 .logo-block {
   text-align: center;
   margin-bottom: 36px;
 }
 
-.logo-emblem {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  border: 1px solid var(--border2);
-  border-radius: var(--r);
-  background: var(--s1);
-  margin-bottom: 16px;
-  position: relative;
-  overflow: hidden;
-}
-
-.logo-emblem::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(94,106,210,0.15), transparent);
-}
-
-.logo-emblem svg {
-  position: relative;
-  z-index: 1;
-}
-
 .logo-text {
   font-family: var(--display);
-  font-size: 24px;
-  font-weight: 600;
-  letter-spacing: -0.4px;
-  color: var(--text);
-  display: block;
-  line-height: 1;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(110deg, #ffffff 0%, #d8b4fe 60%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 18px rgba(139,92,246,.40));
 }
 
 .logo-text span {
-  color: var(--gold);
+  background: linear-gradient(110deg, #a78bfa, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .logo-sub {
-  font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 400;
   color: var(--text3);
-  margin-top: 8px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-.logo-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.logo-divider::before,
-.logo-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border2), transparent);
-}
-
-.logo-divider span {
+  margin-top: 7px;
+  letter-spacing: 0.6px;
   font-family: var(--mono);
-  font-size: 10px;
-  color: var(--text3);
-  letter-spacing: 1px;
 }
-
 
 /* ─────────────────────────────────────────────────────
-   6. AUTH CARD
+   AUTH CARD — dark glass, illuminated border
    ───────────────────────────────────────────────────── */
 .auth-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
-  padding: 32px 28px;
+  background: rgba(8, 8, 16, 0.80);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  border: 1px solid var(--border2);
+  border-radius: 18px;
+  padding: 34px 32px 30px;
   position: relative;
   overflow: hidden;
+  /* Cinematic shadow */
+  box-shadow:
+    0 0 0 1px rgba(130,70,255,.08),
+    0 24px 60px rgba(0,0,0,.8),
+    0 0 80px rgba(100,20,255,.06);
 }
 
-/* Top accent line — uses brand lavender */
+/* Illuminated top hairline */
 .auth-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), var(--gold2), transparent);
-  opacity: 0.6;
+  top: 0; left: 8%; right: 8%;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(160,90,255,.55) 50%,
+    transparent 100%);
 }
 
-.card-title {
-  font-family: var(--display);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 6px;
-  letter-spacing: -0.2px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+/* Faint inner top wash */
+.auth-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(180deg, rgba(120,40,255,.04) 0%, transparent 100%);
+  pointer-events: none;
 }
-
-.card-title .icon {
-  font-size: 16px;
-  opacity: 0.8;
-}
-
-.card-subtitle {
-  font-size: 12px;
-  color: var(--text2);
-  margin-bottom: 24px;
-  font-family: var(--mono);
-}
-
 
 /* ─────────────────────────────────────────────────────
-   7. BANNERS (Error / Success)
+   CARD TITLE
+   ───────────────────────────────────────────────────── */
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  letter-spacing: -0.2px;
+}
+
+.card-title .icon { font-size: 15px; }
+
+/* ─────────────────────────────────────────────────────
+   BANNER (error / success)
    ───────────────────────────────────────────────────── */
 .banner {
   display: none;
   padding: 10px 14px;
-  border-radius: var(--r-sm);
+  border-radius: 9px;
   font-size: 13px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
   line-height: 1.5;
-  font-family: var(--body);
 }
 
 .banner.error {
   display: block;
-  background: rgba(229,72,77,0.08);
-  border: 1px solid rgba(229,72,77,0.25);
-  color: var(--red);
+  background: rgba(239,68,68,.07);
+  border: 1px solid rgba(239,68,68,.25);
+  color: var(--red2);
 }
 
 .banner.success {
   display: block;
-  background: rgba(39,166,68,0.08);
-  border: 1px solid rgba(39,166,68,0.25);
-  color: var(--green);
+  background: rgba(16,185,129,.07);
+  border: 1px solid rgba(16,185,129,.25);
+  color: var(--green2);
 }
-
 
 /* ─────────────────────────────────────────────────────
-   8. FORM FIELDS
+   FORM FIELDS
    ───────────────────────────────────────────────────── */
-.field {
-  margin-bottom: 16px;
-}
+.field { margin-bottom: 18px; }
 
 .field label {
   display: block;
-  font-family: var(--body);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text3);
   margin-bottom: 7px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .field input {
   width: 100%;
-  padding: 10px 14px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--r-sm);
+  padding: 11px 14px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
   color: var(--text);
   font-family: var(--mono);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: border-color .25s ease, box-shadow .3s ease;
 }
 
 .field input:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(94,106,210,0.2);
+  border-color: rgba(130,70,255,.50);
+  box-shadow: 0 0 0 3px rgba(100,20,255,.10), 0 0 16px rgba(100,20,255,.08);
 }
 
 .field input::placeholder {
-  color: var(--text3);
-  font-family: var(--body);
+  color: var(--text4);
+  font-family: var(--display);
   font-size: 13px;
 }
 
-
 /* ─────────────────────────────────────────────────────
-   9. PASSWORD STRENGTH
+   PASSWORD STRENGTH
    ───────────────────────────────────────────────────── */
-.strength-bar-container {
-  display: none;
-  margin-top: 10px;
-}
+.strength-bar-container { display: none; margin-top: 8px; }
 
 .strength-bar-track {
   height: 3px;
-  background: var(--border);
+  background: rgba(130,70,255,.10);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -365,161 +259,130 @@ body::after {
   height: 100%;
   width: 0%;
   border-radius: 2px;
-  transition: width 0.3s, background-color 0.3s;
+  transition: width .35s ease, background-color .35s ease;
 }
 
 .strength-label {
   font-size: 11px;
   font-family: var(--mono);
-  margin-top: 6px;
-  color: var(--text2);
+  margin-top: 5px;
+  color: var(--text3);
 }
 
 .strength-rules {
   margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 12px;
+  gap: 5px 12px;
 }
 
 .strength-rules span {
   font-size: 11px;
   font-family: var(--mono);
-  color: var(--text3);
-  transition: color 0.2s;
+  color: var(--text4);
+  transition: color .2s;
 }
 
-.strength-rules span.pass {
-  color: var(--green);
-}
-
+.strength-rules span.pass { color: var(--green2); }
 
 /* ─────────────────────────────────────────────────────
-   10. BUTTONS
+   PRIMARY BUTTON — purple gradient + glow
    ───────────────────────────────────────────────────── */
 .btn-primary {
   width: 100%;
-  padding: 10px 0;
-  background: var(--gold);
-  color: #fff;
+  padding: 12px 0;
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #8b5cf6 100%);
+  color: #ffffff;
   border: none;
-  border-radius: var(--r-sm);
-  font-family: var(--body);
+  border-radius: 10px;
+  font-family: var(--display);
   font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-  margin-top: 8px;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
-  opacity: 0;
-  transition: opacity 0.2s;
+  font-weight: 600;
+  cursor: url('../../../assets/cursor.png') 32 32, pointer;
+  letter-spacing: -0.1px;
+  box-shadow:
+    0 0 0 1px rgba(124,58,237,.40),
+    0 4px 18px rgba(100,20,220,.35),
+    0 0 50px rgba(80,0,180,.10);
+  transition: box-shadow .4s ease, transform .25s ease, filter .2s ease;
+  margin-top: 6px;
 }
 
 .btn-primary:hover {
-  background: var(--gold2);
-}
-
-.btn-primary:hover::before {
-  opacity: 1;
+  filter: brightness(1.08);
+  box-shadow:
+    0 0 0 1px rgba(139,92,246,.50),
+    0 4px 26px rgba(100,20,220,.50),
+    0 0 70px rgba(80,0,180,.18);
+  transform: translateY(-2px);
 }
 
 .btn-primary:active {
-  background: var(--gold-focus);
-  transform: scale(0.99);
+  transform: translateY(0);
+  filter: brightness(.96);
+  box-shadow: 0 0 0 1px rgba(124,58,237,.30), 0 2px 8px rgba(100,20,220,.25);
 }
 
 .btn-primary:disabled {
-  opacity: 0.4;
+  opacity: .4;
   cursor: not-allowed;
   transform: none;
+  box-shadow: none;
 }
 
-
 /* ─────────────────────────────────────────────────────
-   11. TOGGLE LINK
+   TOGGLE LINK
    ───────────────────────────────────────────────────── */
 .toggle-text {
   text-align: center;
   margin-top: 20px;
   font-size: 13px;
-  color: var(--text2);
-  font-family: var(--body);
+  color: var(--text3);
 }
 
 .toggle-text a {
-  color: var(--gold2);
+  color: var(--accent3);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
-  transition: color 0.15s;
+  transition: color .2s, text-shadow .3s;
 }
 
 .toggle-text a:hover {
-  color: var(--text);
-  text-decoration: underline;
+  color: var(--accent4);
+  text-shadow: 0 0 12px rgba(167,139,250,.45);
 }
 
-
 /* ─────────────────────────────────────────────────────
-   12. FOOTER
+   FOOTER
    ───────────────────────────────────────────────────── */
 .footer {
   text-align: center;
-  margin-top: 28px;
-  font-size: 11px;
-  color: var(--text3);
-  font-family: var(--mono);
-  letter-spacing: 0.5px;
-}
-
-
-/* ─────────────────────────────────────────────────────
-   13. STATUS DOTS
-   ───────────────────────────────────────────────────── */
-.status-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 14px;
-}
-
-.status-dot {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-family: var(--mono);
+  margin-top: 32px;
   font-size: 10px;
-  color: var(--text3);
+  color: var(--text4);
+  font-family: var(--mono);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
-
-.status-dot::before {
-  content: '';
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 6px rgba(39,166,68,0.5);
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.4; }
-}
-
 
 /* ─────────────────────────────────────────────────────
-   14. UTILITIES
+   HIDDEN HELPER
    ───────────────────────────────────────────────────── */
-.hidden {
-  display: none !important;
+.hidden { display: none !important; }
+
+/* ─────────────────────────────────────────────────────
+   SCROLLBAR
+   ───────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track  { background: #000; }
+::-webkit-scrollbar-thumb  { background: rgba(139,92,246,.30); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139,92,246,.55); }
+
+/* ─────────────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .auth-card { padding: 26px 22px 24px; border-radius: 14px; }
+  .logo-text  { font-size: 26px; }
 }
