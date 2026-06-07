@@ -398,57 +398,62 @@
     <div id="sessionModal" style="
       display:none;
       position:fixed;top:0;left:0;right:0;bottom:0;
-      background:rgba(1,1,2,.82);
-      backdrop-filter:blur(6px);
-      -webkit-backdrop-filter:blur(6px);
+      background:rgba(13,4,22,.85);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
       z-index:9999;
       align-items:center;
       justify-content:center;
     ">
       <div style="
-        background:#0f1114;
-        border:1px solid rgba(229,72,77,.45);
-        border-radius:14px;
-        padding:36px 40px;
-        max-width:400px;
+        background:rgba(26,13,46,0.90);
+        backdrop-filter:blur(24px);
+        border:1px solid rgba(244,63,94,.50);
+        border-radius:18px;
+        padding:38px 42px;
+        max-width:420px;
         width:90%;
         text-align:center;
-        box-shadow:0 0 0 1px rgba(229,72,77,.25),0 0 40px rgba(229,72,77,.18);
+        box-shadow:0 0 0 1px rgba(244,63,94,.22),0 0 50px rgba(244,63,94,.18),0 0 0 100vmax rgba(13,4,22,.4);
         animation:fadeInUp .35s cubic-bezier(.4,0,.2,1);
+        position:relative;
+        overflow:hidden;
       ">
-        <div style="font-size:36px;margin-bottom:12px">⏱</div>
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:600;color:#f7f8f8;margin-bottom:8px">Session Expiring Soon</div>
-        <div style="font-family:'Inter',sans-serif;font-size:13px;color:#8a8f98;margin-bottom:20px;line-height:1.6">
+        <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(251,113,133,.6),transparent)"></div>
+        <div style="font-size:38px;margin-bottom:14px">⏱</div>
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:700;color:#f0eaff;margin-bottom:10px;letter-spacing:-0.3px">Session Expiring Soon</div>
+        <div style="font-family:'Inter',sans-serif;font-size:13px;color:#b89ee0;margin-bottom:22px;line-height:1.65">
           Your session will automatically end due to inactivity.<br>
-          You will be logged out in <strong id="sessionCountdown" style="color:#e5484d;font-family:'JetBrains Mono',monospace;font-size:15px">60</strong> seconds.
+          You will be logged out in <strong id="sessionCountdown" style="color:#fb7185;font-family:'JetBrains Mono',monospace;font-size:16px">60</strong> seconds.
         </div>
-        <div style="display:flex;gap:10px;justify-content:center">
+        <div style="display:flex;gap:12px;justify-content:center">
           <button onclick="extendSession()" style="
-            padding:9px 22px;
-            background:#5e6ad2;
+            padding:10px 24px;
+            background:linear-gradient(135deg,#7c3aed,#5b21b6);
             border:none;
-            border-radius:8px;
+            border-radius:10px;
             color:#fff;
             font-family:'Inter',sans-serif;
             font-size:14px;
-            font-weight:500;
+            font-weight:600;
             cursor:pointer;
-            transition:all .2s;
-          " onmouseover="this.style.background='#828fff'" onmouseout="this.style.background='#5e6ad2'">
+            transition:all .25s;
+            box-shadow:0 0 16px rgba(139,92,246,.4);
+          " onmouseover="this.style.filter='brightness(1.15)';this.style.transform='translateY(-1px)'" onmouseout="this.style.filter='';this.style.transform=''">
             Stay Logged In
           </button>
           <button onclick="handleLogout()" style="
-            padding:9px 22px;
-            background:rgba(229,72,77,.12);
-            border:1px solid rgba(229,72,77,.4);
-            border-radius:8px;
-            color:#e57b7e;
+            padding:10px 24px;
+            background:rgba(244,63,94,.10);
+            border:1px solid rgba(244,63,94,.40);
+            border-radius:10px;
+            color:#fb7185;
             font-family:'Inter',sans-serif;
             font-size:14px;
-            font-weight:500;
+            font-weight:600;
             cursor:pointer;
-            transition:all .2s;
-          " onmouseover="this.style.background='rgba(229,72,77,.25)'" onmouseout="this.style.background='rgba(229,72,77,.12)'">
+            transition:all .25s;
+          " onmouseover="this.style.background='rgba(244,63,94,.22)';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='rgba(244,63,94,.10)';this.style.transform=''">
             Logout Now
           </button>
         </div>
@@ -836,8 +841,8 @@
       // ── Analytics ──
       let analyticsLoaded = false;
       const CI = {};
-      const TC = '#62666d', GC = 'rgba(35,37,42,0.8)';
-      const TT = { backgroundColor: '#1a1c22', titleColor: '#f7f8f8', bodyColor: '#8a8f98', borderColor: '#23252a', borderWidth: 1, padding: 10 };
+      const TC = '#7c6aa0', GC = 'rgba(120,60,220,0.10)';
+      const TT = { backgroundColor: 'rgba(26,13,46,0.96)', titleColor: '#f0eaff', bodyColor: '#b89ee0', borderColor: 'rgba(150,80,255,0.35)', borderWidth: 1, padding: 12, backdropFilter: 'blur(12px)' };
       const MF = { family: "'JetBrains Mono', monospace", size: 11 };
 
       // Chart instance registry — destroy before recreating
@@ -896,16 +901,16 @@
 
           // Mn Trend
           chartQueue.push(() => mkLine('chartMnMonthly', aL, [
-            { label: 'Actual', data: aA, borderColor: '#828fff', backgroundColor: 'rgba(130,143,255,.08)', fill: true },
-            { label: 'Predicted', data: aP, borderColor: '#5e6ad2', backgroundColor: 'rgba(94,106,210,.06)', borderDash: [6, 3], fill: true }
+            { label: 'Actual', data: aA, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,.10)', fill: true },
+            { label: 'Predicted', data: aP, borderColor: '#c084fc', backgroundColor: 'rgba(192,132,252,.07)', borderDash: [6, 3], fill: true }
           ]));
 
           // RMSE
-          const rc = data.xgb_rmse.rmse.map(v => v > 0.03 ? 'rgba(229,72,77,.4)' : v > 0.015 ? 'rgba(245,166,35,.4)' : 'rgba(39,166,68,.4)');
-          const rb = data.xgb_rmse.rmse.map(v => v > 0.03 ? '#e5484d' : v > 0.015 ? '#f5a623' : '#27a644');
+          const rc = data.xgb_rmse.rmse.map(v => v > 0.03 ? 'rgba(244,63,94,.45)' : v > 0.015 ? 'rgba(245,158,11,.45)' : 'rgba(16,185,129,.45)');
+          const rb = data.xgb_rmse.rmse.map(v => v > 0.03 ? '#f43f5e' : v > 0.015 ? '#f59e0b' : '#10b981');
           chartQueue.push(() => {
-            mkChart('chartRMSE2', { type: 'bar', data: { labels: data.xgb_rmse.elements, datasets: [{ data: data.xgb_rmse.rmse, backgroundColor: rc, borderColor: rb, borderWidth: 1.5, borderRadius: 4, barPercentage: .55 }] }, options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => 'RMSE: ' + ctx.parsed.y.toFixed(5) } } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 14 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } });
-            mkChart('chartRMSE', { type: 'bar', data: { labels: data.xgb_rmse.elements, datasets: [{ data: data.xgb_rmse.rmse, backgroundColor: rc, borderColor: rb, borderWidth: 1.5, borderRadius: 4, barPercentage: .55 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 13 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } });
+            mkChart('chartRMSE2', { type: 'bar', data: { labels: data.xgb_rmse.elements, datasets: [{ data: data.xgb_rmse.rmse, backgroundColor: rc, borderColor: rb, borderWidth: 1.5, borderRadius: 6, barPercentage: .55 }] }, options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => 'RMSE: ' + ctx.parsed.y.toFixed(5) } } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 14 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } });
+            mkChart('chartRMSE', { type: 'bar', data: { labels: data.xgb_rmse.elements, datasets: [{ data: data.xgb_rmse.rmse, backgroundColor: rc, borderColor: rb, borderWidth: 1.5, borderRadius: 6, barPercentage: .55 }] }, options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 13 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } });
           });
 
           // Error dist
@@ -913,9 +918,9 @@
           chartQueue.push(() => mkChart('chartMnErrorDist', { type: 'bar', data: { labels: aL, datasets: [{ data: errs, backgroundColor: errs.map(e => e >= 0 ? 'rgba(39,166,68,.4)' : 'rgba(229,72,77,.4)'), borderColor: errs.map(e => e >= 0 ? '#27a644' : '#e5484d'), borderWidth: 1, borderRadius: 2, barPercentage: .7 }] }, options: { responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => 'Error: ' + (ctx.parsed.y >= 0 ? '+' : '') + ctx.parsed.y.toFixed(4) + ' wt%' } } }, scales: { x: { ticks: { color: TC, font: { ...MF, size: 9 }, maxRotation: 45 }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } } } } }));
 
           // R² compare
-          const mcolors = { 'Linear Regression': { bg: 'rgba(138,143,152,.3)', b: '#8a8f98' }, 'Random Forest': { bg: 'rgba(39,166,68,.3)', b: '#27a644' }, 'XGBoost': { bg: 'rgba(94,106,210,.4)', b: '#5e6ad2' }, 'LightGBM': { bg: 'rgba(130,143,255,.3)', b: '#828fff' } };
-          const r2ds = Object.entries(data.r2_compare.models).map(([n, v]) => ({ label: n, data: v, backgroundColor: mcolors[n]?.bg || 'rgba(255,255,255,.15)', borderColor: mcolors[n]?.b || '#8a8f98', borderWidth: 1, borderRadius: 2, barPercentage: .75 }));
-          const r2opts = { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', align: 'end', labels: { color: TC, font: MF, boxWidth: 12, padding: 14 } }, tooltip: { ...TT } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 13 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC }, min: -.1, max: 1 } } };
+          const mcolors = { 'Linear Regression': { bg: 'rgba(124,106,180,.25)', b: '#7c6ab4' }, 'Random Forest': { bg: 'rgba(16,185,129,.30)', b: '#10b981' }, 'XGBoost': { bg: 'rgba(139,92,246,.42)', b: '#8b5cf6' }, 'LightGBM': { bg: 'rgba(167,139,250,.30)', b: '#a78bfa' } };
+          const r2ds = Object.entries(data.r2_compare.models).map(([n, v]) => ({ label: n, data: v, backgroundColor: mcolors[n]?.bg || 'rgba(255,255,255,.12)', borderColor: mcolors[n]?.b || '#7c6aa0', borderWidth: 1.5, borderRadius: 5, barPercentage: .75 }));
+          const r2opts = { responsive: true, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', align: 'end', labels: { color: TC, font: MF, boxWidth: 12, padding: 14 } }, tooltip: { ...TT } }, scales: { x: { ticks: { color: TC, font: { ...MF, weight: '700', size: 13 } }, grid: { display: false } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC } }, min: -.1, max: 1 } };
           chartQueue.push(() => {
             mkChart('chartR2Compare', { type: 'bar', data: { labels: data.r2_compare.elements, datasets: r2ds }, options: r2opts });
             mkChart('chartR2Compare2', { type: 'bar', data: { labels: data.r2_compare.elements, datasets: r2ds }, options: r2opts });
@@ -923,23 +928,23 @@
 
           // Radar
           const mns = Object.keys(data.r2_compare.models);
-          chartQueue.push(() => mkChart('chartRadar', { type: 'radar', data: { labels: mns, datasets: [{ label: 'Mn R²', data: mns.map(m => data.r2_compare.models[m][0]), borderColor: '#5e6ad2', backgroundColor: 'rgba(94,106,210,.12)', borderWidth: 2, pointBackgroundColor: '#5e6ad2', pointRadius: 3 }, { label: 'C R²', data: mns.map(m => data.r2_compare.models[m][2]), borderColor: '#828fff', backgroundColor: 'rgba(130,143,255,.08)', borderWidth: 2, pointBackgroundColor: '#828fff', pointRadius: 3 }] }, options: { responsive: true, plugins: { legend: { position: 'top', labels: { color: TC, font: MF, boxWidth: 10 } }, tooltip: { ...TT } }, scales: { r: { min: 0, max: 1, ticks: { color: TC, font: { ...MF, size: 9 }, backdropColor: 'transparent', stepSize: .25 }, grid: { color: 'rgba(35,37,42,.8)' }, angleLines: { color: 'rgba(35,37,42,.8)' }, pointLabels: { color: '#8a8f98', font: { ...MF, size: 10 } } } } } }));
+          chartQueue.push(() => mkChart('chartRadar', { type: 'radar', data: { labels: mns, datasets: [{ label: 'Mn R²', data: mns.map(m => data.r2_compare.models[m][0]), borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,.18)', borderWidth: 2.5, pointBackgroundColor: '#a78bfa', pointRadius: 4, pointHoverRadius: 6 }, { label: 'C R²', data: mns.map(m => data.r2_compare.models[m][2]), borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,.10)', borderWidth: 2, pointBackgroundColor: '#34d399', pointRadius: 3, pointHoverRadius: 5 }] }, options: { responsive: true, plugins: { legend: { position: 'top', labels: { color: TC, font: MF, boxWidth: 10 } }, tooltip: { ...TT } }, scales: { r: { min: 0, max: 1, ticks: { color: TC, font: { ...MF, size: 9 }, backdropColor: 'transparent', stepSize: .25 }, grid: { color: 'rgba(120,60,220,0.15)' }, angleLines: { color: 'rgba(120,60,220,0.15)' }, pointLabels: { color: '#b89ee0', font: { ...MF, size: 10 } } } } } }));
 
           // Grade dist
-          const gc = data.grade_dist.counts.map((c, i) => `rgba(94,106,210,${0.2 + 0.4 * (1 - i / data.grade_dist.counts.length)})`);
+          const gc = data.grade_dist.counts.map((c, i) => `rgba(139,92,246,${0.22 + 0.45 * (1 - i / data.grade_dist.counts.length)})`);
           chartQueue.push(() => {
-            mkChart('chartGradeDist2', { type: 'bar', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: gc, borderColor: '#5e6ad2', borderWidth: 1, borderRadius: 2, barPercentage: .7 }] }, options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => ctx.parsed.x.toLocaleString() + ' heats' } } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC } }, y: { ticks: { color: TC, font: { ...MF, size: 9 } }, grid: { display: false } } } } });
-            mkChart('chartGradeDist', { type: 'bar', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: gc, borderColor: '#5e6ad2', borderWidth: 1, borderRadius: 2, barPercentage: .7 }] }, options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC } }, y: { ticks: { color: TC, font: { ...MF, size: 9 } }, grid: { display: false } } } } });
+            mkChart('chartGradeDist2', { type: 'bar', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: gc, borderColor: '#8b5cf6', borderWidth: 1.5, borderRadius: 5, barPercentage: .7 }] }, options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => ctx.parsed.x.toLocaleString() + ' heats' } } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC } }, y: { ticks: { color: TC, font: { ...MF, size: 9 } }, grid: { display: false } } } } });
+            mkChart('chartGradeDist', { type: 'bar', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: gc, borderColor: '#8b5cf6', borderWidth: 1.5, borderRadius: 5, barPercentage: .7 }] }, options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC } }, y: { ticks: { color: TC, font: { ...MF, size: 9 } }, grid: { display: false } } } } });
           });
 
           // Doughnut
-          const dcs = ['#5e6ad2', '#828fff', '#27a644', '#e5484d', '#8957e5', '#2dd4bf', '#f5a623', '#f472b6', '#8a8f98', '#62666d'];
+          const dcs = ['#8b5cf6', '#a78bfa', '#10b981', '#f43f5e', '#60a5fa', '#c084fc', '#f59e0b', '#34d399', '#fb7185', '#818cf8'];
           const tot = data.grade_dist.counts.reduce((a, b) => a + b, 0);
           chartQueue.push(() => mkChart('chartGradeDoughnut', { type: 'doughnut', data: { labels: data.grade_dist.labels, datasets: [{ data: data.grade_dist.counts, backgroundColor: dcs, borderColor: '#010102', borderWidth: 2, hoverOffset: 4 }] }, options: { responsive: true, cutout: '55%', plugins: { legend: { position: 'right', labels: { color: TC, font: { ...MF, size: 10 }, boxWidth: 10, padding: 8 } }, tooltip: { ...TT, callbacks: { label: ctx => `${ctx.label}: ${ctx.parsed.toLocaleString()} (${((ctx.parsed / tot) * 100).toFixed(1)}%)` } } } } }));
 
           // FA Scatter
           const scOpts = { responsive: true, plugins: { legend: { display: false }, tooltip: { ...TT, callbacks: { label: ctx => `FA: ${ctx.parsed.x} kg → Mn: ${ctx.parsed.y.toFixed(3)} wt%` } } }, scales: { x: { ticks: { color: TC, font: MF }, grid: { color: GC }, title: { display: true, text: 'Total FA Ladle (kg)', color: TC, font: MF } }, y: { ticks: { color: TC, font: MF }, grid: { color: GC }, title: { display: true, text: 'Mn (wt%)', color: TC, font: MF } } } };
-          const scData = { datasets: [{ label: 'Data', data: data.fa_scatter.x.map((x, i) => ({ x, y: data.fa_scatter.y[i] })), backgroundColor: 'rgba(232,160,32,.6)', borderColor: '#e8a020', borderWidth: 1.5, pointRadius: 5, pointHoverRadius: 7 }] };
+          const scData = { datasets: [{ label: 'Data', data: data.fa_scatter.x.map((x, i) => ({ x, y: data.fa_scatter.y[i] })), backgroundColor: 'rgba(167,139,250,.55)', borderColor: '#a78bfa', borderWidth: 1.5, pointRadius: 5, pointHoverRadius: 8 }] };
           chartQueue.push(() => {
             mkChart('chartFAScatter', { type: 'scatter', data: scData, options: { ...scOpts, plugins: { ...scOpts.plugins, legend: { display: false } } } });
             mkChart('chartFAScatter2', { type: 'scatter', data: scData, options: scOpts });
@@ -947,8 +952,8 @@
 
           // Mn trend on dashboard
           chartQueue.push(() => mkLine('chartMnTrend', aL, [
-            { label: 'Actual', data: aA, borderColor: '#1e6fbf', backgroundColor: 'rgba(30,111,191,.1)', fill: true },
-            { label: 'Predicted', data: aP, borderColor: '#e8a020', backgroundColor: 'rgba(232,160,32,.06)', borderDash: [6, 3], fill: true }
+            { label: 'Actual', data: aA, borderColor: '#a78bfa', backgroundColor: 'rgba(167,139,250,.10)', fill: true },
+            { label: 'Predicted', data: aP, borderColor: '#34d399', backgroundColor: 'rgba(52,211,153,.06)', borderDash: [6, 3], fill: true }
           ]));
 
           // Metrics table
@@ -993,8 +998,8 @@
     <script src="js/animations.js"></script>
 
     <!-- ═══ DEVELOPER CREDIT ═══ -->
-    <footer style="text-align:center;padding:18px 24px;border-top:1px solid var(--border);font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--text3);">
-      Built by <a href="https://siddharthkumar.tech" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:none;font-weight:600;transition:all .2s;border-bottom:1px solid transparent;" onmouseover="this.style.borderBottomColor='var(--gold)';this.style.textShadow='0 0 12px rgba(232,160,32,.4)'" onmouseout="this.style.borderBottomColor='transparent';this.style.textShadow='none'">Siddharth Kumar</a> · <span style="color:var(--text3)">SAIL Durgapur · FerroMind</span>
+    <footer style="text-align:center;padding:18px 24px;border-top:1px solid var(--border2);font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--text3);background:rgba(13,4,22,0.5);backdrop-filter:blur(8px);">
+      Built by <a href="https://siddharthkumar.tech" target="_blank" rel="noopener noreferrer" style="background:linear-gradient(90deg,#c084fc,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-decoration:none;font-weight:700;transition:all .2s;filter:drop-shadow(0 0 8px rgba(139,92,246,.4));" onmouseover="this.style.filter='drop-shadow(0 0 14px rgba(139,92,246,.7))'" onmouseout="this.style.filter='drop-shadow(0 0 8px rgba(139,92,246,.4))'">Siddharth Kumar</a> · <span style="color:var(--text3)">SAIL Durgapur · FerroMind</span>
     </footer>
   </body>
 
