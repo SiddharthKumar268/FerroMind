@@ -96,30 +96,30 @@
 
 /* Repeating soft glow pulse — used on live dot, active elements */
 @keyframes glowPulse {
-  0%   { box-shadow: 0 0 4px rgba(94,106,210,.4),  0 0 10px rgba(94,106,210,.2); }
-  50%  { box-shadow: 0 0 12px rgba(94,106,210,.7), 0 0 28px rgba(94,106,210,.35); }
-  100% { box-shadow: 0 0 4px rgba(94,106,210,.4),  0 0 10px rgba(94,106,210,.2); }
+  0%   { box-shadow: 0 0 4px rgba(139,92,246,.4),  0 0 10px rgba(139,92,246,.2); }
+  50%  { box-shadow: 0 0 12px rgba(139,92,246,.7), 0 0 28px rgba(139,92,246,.35); }
+  100% { box-shadow: 0 0 4px rgba(139,92,246,.4),  0 0 10px rgba(139,92,246,.2); }
 }
 
 /* Green glow pulse — for pass cells and live status */
 @keyframes glowPulseGreen {
-  0%   { box-shadow: 0 0 4px rgba(39,166,68,.4),  0 0 10px rgba(39,166,68,.2); }
-  50%  { box-shadow: 0 0 14px rgba(39,166,68,.7), 0 0 30px rgba(39,166,68,.35); }
-  100% { box-shadow: 0 0 4px rgba(39,166,68,.4),  0 0 10px rgba(39,166,68,.2); }
+  0%   { box-shadow: 0 0 4px rgba(16,185,129,.4),  0 0 10px rgba(16,185,129,.2); }
+  50%  { box-shadow: 0 0 14px rgba(16,185,129,.7), 0 0 30px rgba(16,185,129,.35); }
+  100% { box-shadow: 0 0 4px rgba(16,185,129,.4),  0 0 10px rgba(16,185,129,.2); }
 }
 
 /* Red glow pulse — for fail cells */
 @keyframes glowPulseRed {
-  0%   { box-shadow: 0 0 4px rgba(229,72,77,.4),  0 0 10px rgba(229,72,77,.2); }
-  50%  { box-shadow: 0 0 14px rgba(229,72,77,.7), 0 0 30px rgba(229,72,77,.35); }
-  100% { box-shadow: 0 0 4px rgba(229,72,77,.4),  0 0 10px rgba(229,72,77,.2); }
+  0%   { box-shadow: 0 0 4px rgba(244,63,94,.4),  0 0 10px rgba(244,63,94,.2); }
+  50%  { box-shadow: 0 0 14px rgba(244,63,94,.7), 0 0 30px rgba(244,63,94,.35); }
+  100% { box-shadow: 0 0 4px rgba(244,63,94,.4),  0 0 10px rgba(244,63,94,.2); }
 }
 
 /* Animated border glow sweep — entrance for cards */
 @keyframes borderGlowIn {
   0%   { box-shadow: none; opacity: 0; transform: translateY(10px); }
   60%  { opacity: 1; transform: translateY(0); }
-  80%  { box-shadow: 0 0 0 1px rgba(94,106,210,.4), 0 0 20px rgba(94,106,210,.25); }
+  80%  { box-shadow: 0 0 0 1px rgba(139,92,246,.4), 0 0 20px rgba(139,92,246,.25); }
   100% { box-shadow: none; opacity: 1; transform: translateY(0); }
 }
 
@@ -127,22 +127,22 @@
 @keyframes kpiGlowIn {
   0%   { opacity: 0; transform: translateY(10px); box-shadow: none; }
   70%  { opacity: 1; transform: translateY(0); }
-  85%  { box-shadow: 0 0 0 1px rgba(94,106,210,.45), 0 0 24px rgba(94,106,210,.3); }
+  85%  { box-shadow: 0 0 0 1px rgba(139,92,246,.45), 0 0 24px rgba(139,92,246,.3); }
   100% { opacity: 1; transform: translateY(0); box-shadow: none; }
 }
 
 /* Loading logo glow entrance */
 @keyframes logoGlowIn {
-  0%   { opacity: 0; text-shadow: none; }
-  60%  { opacity: 1; text-shadow: 0 0 30px rgba(94,106,210,.9), 0 0 60px rgba(94,106,210,.4); }
-  100% { opacity: 1; text-shadow: 0 0 12px rgba(94,106,210,.3); }
+  0%   { opacity: 0; filter: none; }
+  60%  { opacity: 1; filter: drop-shadow(0 0 20px rgba(139,92,246,.9)) drop-shadow(0 0 40px rgba(192,132,252,.5)); }
+  100% { opacity: 1; filter: drop-shadow(0 0 10px rgba(139,92,246,.35)); }
 }
 
 /* Glowing progress bar for load screen */
 @keyframes loadBarGlow {
   0%   { width: 0; box-shadow: none; }
-  50%  { box-shadow: 0 0 10px rgba(94,106,210,.8), 0 0 20px rgba(94,106,210,.4); }
-  100% { width: 100%; box-shadow: 0 0 6px rgba(94,106,210,.5); }
+  50%  { box-shadow: 0 0 12px rgba(139,92,246,.8), 0 0 24px rgba(192,132,252,.4); }
+  100% { width: 100%; box-shadow: 0 0 8px rgba(139,92,246,.5); }
 }
 
 /* Live dot repeating ping */
@@ -227,7 +227,7 @@ header {
   transition: transform .3s ease, background-color .3s ease;
 }
 
-header.scrolled   { background: rgba(1,1,2,.95); }
+header.scrolled   { background: rgba(13,4,22,.96); backdrop-filter: blur(24px); }
 header.hidden-up  { transform: translateY(-100%); transition: transform .3s ease; }
 
 
@@ -507,17 +507,17 @@ header.hidden-up  { transform: translateY(-100%); transition: transform .3s ease
 #cursor-dot {
   width: 8px;
   height: 8px;
-  background: var(--gold, #5e6ad2);
+  background: var(--gold, #8b5cf6);
   transition: width .2s ease, height .2s ease, background-color .2s ease;
-  box-shadow: 0 0 6px rgba(94,106,210,.6);
+  box-shadow: 0 0 8px rgba(139,92,246,.7);
 }
 
 #cursor-ring {
   width: 32px;
   height: 32px;
-  border: 1px solid var(--gold, #5e6ad2);
+  border: 1px solid var(--gold, #8b5cf6);
   transition: width .2s ease, height .2s ease, border-color .2s ease;
-  box-shadow: 0 0 10px rgba(94,106,210,.25);
+  box-shadow: 0 0 12px rgba(139,92,246,.3);
 }
 
 
@@ -528,7 +528,7 @@ header.hidden-up  { transform: translateY(-100%); transition: transform .3s ease
 /* Live green dot — glowing ping effect */
 .api-dot.live {
   position: relative;
-  box-shadow: 0 0 6px rgba(39,166,68,.8);
+  box-shadow: 0 0 6px rgba(16,185,129,.8);
 }
 
 .api-dot.live::after {
@@ -536,11 +536,11 @@ header.hidden-up  { transform: translateY(-100%); transition: transform .3s ease
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: rgba(39,166,68,.6);
+  background: rgba(16,185,129,.6);
   animation: liveDotPing 2s ease-in-out infinite;
 }
 
 /* Error dot glow */
 .api-dot.err {
-  box-shadow: 0 0 6px rgba(229,72,77,.8);
+  box-shadow: 0 0 6px rgba(244,63,94,.8);
 }
