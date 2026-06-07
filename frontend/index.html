@@ -460,14 +460,28 @@
     </div>
 
     <script>
-      // ── JWT Fetch Interceptor ──
+      // ── JWT + Log-Id Fetch Interceptor ──
       const _fetch = window.fetch;
       window.fetch = async function (...args) {
         let [res, cfg] = args;
-        const tok = localStorage.getItem('ferromind_token');
-        if (tok) { cfg = cfg || {}; cfg.headers = cfg.headers || {}; if (!(cfg.headers instanceof Headers)) cfg.headers['Authorization'] = `Bearer ${tok}`; }
+        const tok   = localStorage.getItem('ferromind_token');
+        const logId = localStorage.getItem('ferromind_logId');
+        if (tok) {
+          cfg = cfg || {};
+          cfg.headers = cfg.headers || {};
+          if (!(cfg.headers instanceof Headers)) {
+            cfg.headers['Authorization'] = `Bearer ${tok}`;
+            if (logId) cfg.headers['X-Log-Id'] = logId;  // page tracker
+          }
+        }
         const r = await _fetch(res, cfg);
-        if (r.status === 401) { localStorage.removeItem('ferromind_token'); localStorage.removeItem('ferromind_user'); window.location.href = 'login.html'; }
+        if (r.status === 401) {
+          localStorage.removeItem('ferromind_token');
+          localStorage.removeItem('ferromind_user');
+          localStorage.removeItem('ferromind_logId');
+          localStorage.removeItem('ferromind_role');
+          window.location.href = 'login.html';
+        }
         return r;
       };
 
@@ -478,13 +492,45 @@
         initSessionTimeout();
       });
 
+      // ── Logout — records session end in Atlas ──
+      async function callLogoutAPI() {
+        const tok   = localStorage.getItem('ferromind_token');
+        const logId = localStorage.getItem('ferromind_logId');
+        if (!tok || !logId) return;
+        try {
+          await _fetch('/auth/logout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
+            body: JSON.stringify({ logId }),
+            keepalive: true,   // works even on page unload
+          });
+        } catch (_) {}
+      }
+
       function handleLogout() {
         clearSessionTimeout();
-        localStorage.removeItem('ferromind_token');
-        localStorage.removeItem('ferromind_user');
-        localStorage.removeItem('ferromind_login_time');
-        window.location.href = 'login.html';
+        callLogoutAPI().finally(() => {
+          localStorage.removeItem('ferromind_token');
+          localStorage.removeItem('ferromind_user');
+          localStorage.removeItem('ferromind_login_time');
+          localStorage.removeItem('ferromind_logId');
+          localStorage.removeItem('ferromind_role');
+          window.location.href = 'login.html';
+        });
       }
+
+      // ── Record logout when tab is closed / navigated away ──
+      window.addEventListener('beforeunload', () => {
+        const tok   = localStorage.getItem('ferromind_token');
+        const logId = localStorage.getItem('ferromind_logId');
+        if (tok && logId) {
+          // sendBeacon is the most reliable way to fire on tab close
+          const blob = new Blob([JSON.stringify({ logId })], { type: 'application/json' });
+          navigator.sendBeacon
+            ? navigator.sendBeacon('/auth/logout-beacon', blob)
+            : _fetch('/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok }, body: JSON.stringify({ logId }), keepalive: true }).catch(() => {});
+        }
+      });
 
       // ── Session Timeout Manager ──
       // 30 min inactivity → 60-sec warning → auto logout

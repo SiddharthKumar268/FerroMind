@@ -473,6 +473,8 @@
                 } else {
                     localStorage.setItem('ferromind_token', data.token);
                     localStorage.setItem('ferromind_user', data.username || username);
+                    localStorage.setItem('ferromind_role', data.role || 'operator');
+                    if (data.logId) localStorage.setItem('ferromind_logId', data.logId);
                     window.location.href = 'index.html';
                 }
             } catch (err) {
